@@ -84,6 +84,7 @@ public class DocumentActivity extends FragmentActivity
 	protected TextView pageLabel;
 	protected SeekBar pageSeekbar;
 
+	private CSSManager cssManager;
 	protected int pageCount;
 	protected int currentPage;
 	protected int searchHitPage;
@@ -163,7 +164,7 @@ public class DocumentActivity extends FragmentActivity
 		setContentView(R.layout.document_activity);
 
 
-
+		cssManager = new CSSManager();
 		actionBar = findViewById(R.id.action_bar);
 		searchBar = findViewById(R.id.search_bar);
 		navigationBar = findViewById(R.id.navigation_bar);
@@ -243,7 +244,10 @@ public class DocumentActivity extends FragmentActivity
 		worker.start();
 
 		prefs = getPreferences(Context.MODE_PRIVATE);
-		layoutEm = prefs.getFloat("layoutEm", 8);
+		layoutEm = 1;//prefs.getFloat("layoutEm", 8);
+		cssManager.fontSize = 10;
+		Log.i("mytag", "css: "+cssManager.getCSS());
+		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
 		currentPage = prefs.getInt(key, 0);
 		searchHitPage = -1;
 		hasLoaded = false;
@@ -350,7 +354,6 @@ public class DocumentActivity extends FragmentActivity
 				layoutPopupMenu.show();
 			}
 		});
-
 		readerView = findViewById(R.id.reader_view);
 		readerView.setActionListener(actionListener);
 		readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));

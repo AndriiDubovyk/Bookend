@@ -86,7 +86,6 @@ public class PageView extends View implements
 
 
 	public void setActionListener(DocumentActivity l) {
-		Log.i("mytag", "set action listener "+(l!=null));
 		actionListener = l;
 	}
 
