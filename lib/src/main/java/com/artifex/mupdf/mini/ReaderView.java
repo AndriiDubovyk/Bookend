@@ -32,6 +32,20 @@ public class ReaderView extends ViewPager {
         pagerAdapter = adapter;
     }
 
+    /**
+     * Temporary solution
+     * By some cause serCurrentItem(p) or serCurrentItem(p, true) work perfectly.
+     * But serCurrentItem(p, false) work only if we reattach adapter
+     */
+    @Override
+    public void setCurrentItem(int item, boolean smoothScroll) {
+        if(!smoothScroll) this.setAdapter(pagerAdapter);
+        super.setCurrentItem(item, smoothScroll);
+    }
+
+
+
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -45,12 +59,6 @@ public class ReaderView extends ViewPager {
 
     public void updateCachedPages() {
         ((PageAdapter)getAdapter()).updateCachedPages();
-    }
-
-    @Override
-    public void setCurrentItem(int item, boolean smoothScroll) {
-        super.setCurrentItem(item, smoothScroll);
-        Log.i("mytag", "setCurrentItem "+item);
     }
 
     public void setActionListener(DocumentActivity da) {

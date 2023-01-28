@@ -227,8 +227,8 @@ public class PageView extends View implements
 
 			float a = canvasW / 3;
 			float b = a * 2;
-			if (x <= a) actionListener.goBackward();
-			if (x >= b) actionListener.goForward();
+//			if (x <= a) actionListener.goBackward();
+//			if (x >= b) actionListener.goForward();
 			if (x > a && x < b && actionListener != null) actionListener.toggleUI();
 		}
 		invalidate();

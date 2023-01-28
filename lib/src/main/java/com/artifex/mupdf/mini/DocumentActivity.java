@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.PagerAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +62,8 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean isReflowable;
 	protected String title;
 	protected ArrayList<OutlineActivity.Item> flatOutline;
-	protected float layoutW, layoutH, layoutEm;
+	protected float layoutW, layoutH;
+	protected float layoutEm = 1;
 	protected float displayDPI;
 	protected int canvasW, canvasH;
 	protected float pageZoom;
@@ -78,7 +78,6 @@ public class DocumentActivity extends FragmentActivity
 	protected View searchCloseButton;
 	protected View searchBackwardButton;
 	protected View searchForwardButton;
-	protected View zoomButton;
 	protected View layoutButton;
 	protected PopupMenu layoutPopupMenu;
 	protected View outlineButton;
@@ -94,13 +93,6 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean stopSearch;
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
-
-	public String getSearchNeedle() { return searchNeedle; }
-	public void setStopSearch(boolean v) { stopSearch=v; }
-	public float getPageZoom() { return pageZoom; }
-	public int getCanvasW() { return canvasW; }
-	public int getCanvasH() { return canvasH; }
-	public Worker getWorker() {return worker; }
 
 	private String toHex(byte[] digest) {
 		StringBuilder builder = new StringBuilder(2 * digest.length);
@@ -244,8 +236,7 @@ public class DocumentActivity extends FragmentActivity
 		worker.start();
 
 		prefs = getPreferences(Context.MODE_PRIVATE);
-		layoutEm = 1;//prefs.getFloat("layoutEm", 8);
-		cssManager.fontSize = 10;
+		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
 		Log.i("mytag", "css: "+cssManager.getCSS());
 		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
 		currentPage = prefs.getInt(key, 0);
@@ -331,21 +322,15 @@ public class DocumentActivity extends FragmentActivity
 		layoutPopupMenu.getMenuInflater().inflate(R.menu.layout_menu, layoutPopupMenu.getMenu());
 		layoutPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			public boolean onMenuItemClick(MenuItem item) {
-				float oldLayoutEm = layoutEm;
+				int oldFontSize = cssManager.fontSize;
 				int id = item.getItemId();
-				if (id == R.id.action_layout_6pt) layoutEm = 6;
-				else if (id == R.id.action_layout_7pt) layoutEm = 7;
-				else if (id == R.id.action_layout_8pt) layoutEm = 8;
-				else if (id == R.id.action_layout_9pt) layoutEm = 9;
-				else if (id == R.id.action_layout_10pt) layoutEm = 10;
-				else if (id == R.id.action_layout_11pt) layoutEm = 11;
-				else if (id == R.id.action_layout_12pt) layoutEm = 12;
-				else if (id == R.id.action_layout_13pt) layoutEm = 13;
-				else if (id == R.id.action_layout_14pt) layoutEm = 14;
-				else if (id == R.id.action_layout_15pt) layoutEm = 15;
-				else if (id == R.id.action_layout_16pt) layoutEm = 16;
-				if (oldLayoutEm != layoutEm)
-					relayoutDocument();
+				if (id == R.id.font_size_4) cssManager.fontSize=4;
+				else if (id == R.id.font_size_9) cssManager.fontSize = 9;
+				else if (id == R.id.font_size_10) cssManager.fontSize = 10;
+				else if (id == R.id.font_size_11) cssManager.fontSize = 11;
+				else if (id == R.id.font_size_12) cssManager.fontSize = 12;
+				if (oldFontSize != cssManager.fontSize)
+					reopenDocument();
 				return true;
 			}
 		});
@@ -424,6 +409,27 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
+	/**
+	 * Relayout document after we change css
+	 */
+	protected void reopenDocument() {
+		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
+		long mark = doc.makeBookmark(doc.locationFromPageNumber(currentPage));
+		worker.add(new Worker.Task() {
+			boolean needsPassword;
+			public void work() {
+				Log.i(APP, "open document");
+				if (buffer != null)
+					doc = Document.openDocument(buffer, mimetype);
+				else
+					doc = Document.openDocument(stream, mimetype);;
+			}
+			public void run() {
+				reloadDocument(mark);
+			}
+		});
+	}
+
 	protected void askPassword(int message) {
 		final EditText passwordView = new EditText(this);
 		passwordView.setInputType(EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
@@ -470,7 +476,7 @@ public class DocumentActivity extends FragmentActivity
 	public void onPause() {
 		super.onPause();
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putFloat("layoutEm", layoutEm);
+		editor.putInt("fontSize", cssManager.fontSize);
 		editor.putInt(key, currentPage);
 		editor.apply();
 	}
@@ -605,14 +611,12 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				Log.i("mytag", "saved page: "+currentPage);
 				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
-				readerView.setAdapter(readerView.getAdapter());
 				readerView.setCurrentItem(currentPage, false);
 				updatePageNumberInfo(currentPage);
 				loadOutline();
@@ -621,33 +625,48 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	/**
-	 * Rework pages layout after we change page or font size
-	 */
-	protected void relayoutDocument() {
+	protected void reloadDocument(long mark) {
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
-					long mark = doc.makeBookmark(doc.locationFromPageNumber(currentPage));
-					Log.i(APP, "relayout document");
-					doc.layout(layoutW, layoutH, layoutEm);
+					Log.i(APP, "load document");
+					String metaTitle = doc.getMetaData(Document.META_INFO_TITLE);
+					if (metaTitle != null && !metaTitle.equals(""))
+						title = metaTitle;
+					isReflowable = doc.isReflowable();
+					if (isReflowable) {
+						Log.i(APP, "layout document");
+						doc.layout(layoutW, layoutH, layoutEm);
+					}
 					pageCount = doc.countPages();
 					currentPage = doc.pageNumberFromLocation(doc.findBookmark(mark));
 				} catch (Throwable x) {
+					doc = null;
 					pageCount = 1;
 					currentPage = 0;
 					throw x;
 				}
 			}
 			public void run() {
-				updatePageNumberInfo(currentPage);
 				readerView.getAdapter().notifyDataSetChanged();
-				loadOrUpdatePage(currentPage);
-				Log.i("mytag", "doc count: "+pageCount+"; adapter count: "+readerView.getAdapter().getCount());
+				if (currentPage < 0 || currentPage >= pageCount)
+					currentPage = 0;
+				titleLabel.setText(title);
+				if (isReflowable)
+					layoutButton.setVisibility(View.VISIBLE);
+				readerView.setCurrentItem(currentPage, false);
+				updatePageNumberInfo(currentPage);
 				loadOutline();
 			}
 		});
 	}
+
+	public String getSearchNeedle() { return searchNeedle; }
+	public void setStopSearch(boolean v) { stopSearch=v; }
+	public float getPageZoom() { return pageZoom; }
+	public int getCanvasW() { return canvasW; }
+	public int getCanvasH() { return canvasH; }
+	public Worker getWorker() {return worker; }
 
 	private void loadOutline() {
 		worker.add(new Worker.Task() {
@@ -729,13 +748,6 @@ public class DocumentActivity extends FragmentActivity
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			history.push(currentPage);
 			currentPage = p;
-
-			/**
-			 * Temporary solution
-			 * By some cause serCurrentItem(p) or serCurrentItem(p, true) work perfectly.
-			 * But serCurrentItem(p, false) work only if we reattach adapter
-			 */
-			readerView.setAdapter(readerView.getAdapter());
 			readerView.setCurrentItem(p, false);
 
 		}
