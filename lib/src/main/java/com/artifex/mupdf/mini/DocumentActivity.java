@@ -350,8 +350,10 @@ public class DocumentActivity extends FragmentActivity
 				layoutPopupMenu.show();
 			}
 		});
-		openDocument();
 
+		readerView = findViewById(R.id.reader_view);
+		readerView.setActionListener(actionListener);
+		readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
 	}
 
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -388,9 +390,7 @@ public class DocumentActivity extends FragmentActivity
 		if (!hasLoaded) {
 			hasLoaded = true;
 			openDocument();
-		} else if (isReflowable) {
-			//relayoutDocument();
-		} else {
+		} else if(!isReflowable) {
 			loadOrUpdatePage(currentPage);
 		}
 	}
@@ -398,13 +398,11 @@ public class DocumentActivity extends FragmentActivity
 	public void onPageViewZoomChanged(float zoom) {
 		if (zoom != pageZoom) {
 			pageZoom = zoom;
-			Log.i("mytag", "loadPageUpdate src 6: ");
 			loadOrUpdatePage(currentPage);
 		}
 	}
 
 	protected void openDocument() {
-		Log.i("mytag", "open document");
 		worker.add(new Worker.Task() {
 			boolean needsPassword;
 			public void work() {
@@ -484,7 +482,6 @@ public class DocumentActivity extends FragmentActivity
 			}
 		} else {
 			currentPage = history.pop();
-			Log.i("mytag", "loadPageUpdate src 5: ");
 			loadOrUpdatePage(currentPage);
 		}
 	}
@@ -605,9 +602,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				readerView = findViewById(R.id.reader_view);
-				readerView.setActionListener(actionListener);
-				readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
+				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
 				titleLabel.setText(title);

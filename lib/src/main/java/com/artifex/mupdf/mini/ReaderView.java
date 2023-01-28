@@ -30,6 +30,13 @@ public class ReaderView extends ViewPager {
         pagerAdapter = adapter;
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (actionListener != null)
+            actionListener.onPageViewSizeChanged(w, h);
+    }
+
     public PageFragment getCurrentPageFragment() {
         return ((PageAdapter)getAdapter()).getCurrentPageFragment();
     }
