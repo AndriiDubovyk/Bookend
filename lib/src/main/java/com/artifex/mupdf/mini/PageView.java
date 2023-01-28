@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -15,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Scroller;
+
+import androidx.annotation.RequiresApi;
 
 import java.nio.charset.StandardCharsets;
 
@@ -42,13 +45,16 @@ public class PageView extends View implements
 	protected Paint linkPaint;
 	protected Paint searchHitPaint;
 
+	private static int BACKGROUND_COLOR = 0xFFE7DDD0;
+	private static int INK_COLOR = 0xFF302B25;
+
 	private static int ERROR_PAINT_COLOR = 0xffff5050;
 	private static int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
 	private static int LINK_PAINT_COLOR = 0x200000ff;
 
 	public PageView(Context ctx, AttributeSet atts) {
 		super(ctx, atts);
-
+		setBackgroundColor(BACKGROUND_COLOR);
 		scroller = new Scroller(ctx);
 		detector = new GestureDetector(ctx, this);
 		scaleDetector = new ScaleGestureDetector(ctx, this);
@@ -94,7 +100,7 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	public void setBitmap(Bitmap b, float zoom, boolean wentBack, Link[] ls, Quad[][] hs) {
+	private void setBitmap(Bitmap b, float zoom, boolean wentBack, Link[] ls, Quad[][] hs) {
 		if (bitmap != null)
 			bitmap.recycle();
 		error = false;
@@ -139,8 +145,10 @@ public class PageView extends View implements
 					}
 					if (zoom != 1)
 						ctm.scale(zoom);
+					Pixmap pixmap = page.toPixmap(ctm, ColorSpace.DeviceBGR, true);
+					pixmap.tint(INK_COLOR, BACKGROUND_COLOR);
+					bitmap = pixmapToBitmap(pixmap);
 
-					bitmap = AndroidDrawDevice.drawPage(page, ctm);
 				} catch (Throwable x) {
 					Log.i(DocumentActivity.APP, x.getMessage());
 				}
@@ -156,13 +164,21 @@ public class PageView extends View implements
 		});
 	}
 
+	private Bitmap pixmapToBitmap(Pixmap src) {
+		if(src == null) return null;
+		int width = src.getWidth();
+		int height = src.getHeight();
+		Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		result.setPixels(src.getPixels(), 0, width, 0, 0, width, height);
+		return result;
+	}
+
 	public void resetHits() {
 		hits = null;
 		invalidate();
 	}
 
 	public void onSizeChanged(int w, int h, int ow, int oh) {
-		Log.i("mytag", "onSizeChanged, pageView "+(actionListener!=null));
 		canvasW = w;
 		canvasH = h;
 		if (actionListener != null)
@@ -191,6 +207,7 @@ public class PageView extends View implements
 		showLinks = !showLinks;
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.N)
 	public boolean onSingleTapUp(MotionEvent e) {
 		boolean foundLink = false;
 		float x = e.getX();

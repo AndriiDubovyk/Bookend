@@ -12,14 +12,12 @@ import com.artifex.mupdf.fitz.Document;
 public class PageFragment extends Fragment {
 
     public static final String PAGE_NUMBER = "page_number";
-    private final Document mDoc;
     private ViewGroup root;
     private PageView pageView;
     private int pageNumber;
     private final DocumentActivity actionListener;
 
-    public PageFragment(Document d, DocumentActivity da) {
-        mDoc = d;
+    public PageFragment(DocumentActivity da) {
         actionListener = da;
     }
 

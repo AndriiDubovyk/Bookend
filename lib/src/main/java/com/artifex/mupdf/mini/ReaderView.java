@@ -4,7 +4,6 @@ package com.artifex.mupdf.mini;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,14 +48,12 @@ public class ReaderView extends ViewPager {
         //FragmentManager fm =  ((FragmentActivity) context).getSupportFragmentManager();
         setPageTransformer(true, new SlideStackPageTransformer());
         addOnPageChangeListener(new OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            public void onPageScrollStateChanged(int state) {}
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             public void onPageSelected(int position) {
                 Log.i("mytag", "onPageSelected: "+position);
-                actionListener.setPageNumber(position);
+                actionListener.updatePageNumberInfo(position);
             }
         });
     }

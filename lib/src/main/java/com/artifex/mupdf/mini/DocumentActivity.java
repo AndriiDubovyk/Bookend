@@ -1,23 +1,18 @@
 package com.artifex.mupdf.mini;
 
 import com.artifex.mupdf.fitz.*;
-import com.artifex.mupdf.fitz.android.*;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.FileUriExposedException;
-import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,6 +31,8 @@ import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import java.io.IOException;
 import java.io.InputStream;
@@ -375,7 +372,7 @@ public class DocumentActivity extends FragmentActivity
 		case KeyEvent.KEYCODE_T:
 			if (!history.empty()) {
 				currentPage = history.pop();
-				loadPageUpdate(currentPage);
+				loadOrUpdatePage(currentPage);
 			}
 			return true;
 		}
@@ -383,7 +380,6 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onPageViewSizeChanged(int w, int h) {
-		Log.i("mytag", "onSizeChanged, docActive");
 		pageZoom = 1;
 		canvasW = w;
 		canvasH = h;
@@ -393,16 +389,17 @@ public class DocumentActivity extends FragmentActivity
 			hasLoaded = true;
 			openDocument();
 		} else if (isReflowable) {
-			relayoutDocument();
+			//relayoutDocument();
 		} else {
-			loadPageUpdate(currentPage);
+			loadOrUpdatePage(currentPage);
 		}
 	}
 
 	public void onPageViewZoomChanged(float zoom) {
 		if (zoom != pageZoom) {
 			pageZoom = zoom;
-			loadPageUpdate(currentPage);
+			Log.i("mytag", "loadPageUpdate src 6: ");
+			loadOrUpdatePage(currentPage);
 		}
 	}
 
@@ -487,11 +484,12 @@ public class DocumentActivity extends FragmentActivity
 			}
 		} else {
 			currentPage = history.pop();
-			loadPageUpdate(currentPage);
+			Log.i("mytag", "loadPageUpdate src 5: ");
+			loadOrUpdatePage(currentPage);
 		}
 	}
 
-	public void setPageNumber(int newPageNumber) {
+	public void updatePageNumberInfo(int newPageNumber) {
 		currentPage = newPageNumber;
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
@@ -550,11 +548,11 @@ public class DocumentActivity extends FragmentActivity
 				if (stopSearch || needle != searchNeedle) {
 					pageLabel.setText((currentPage+1) + " / " + pageCount);
 				} else if (searchHitPage == currentPage) {
-					loadPageUpdate(currentPage);
+					loadOrUpdatePage(currentPage);
 				} else if (searchHitPage >= 0) {
 					history.push(currentPage);
 					currentPage = searchHitPage;
-					loadPageUpdate(currentPage);
+					loadOrUpdatePage(currentPage);
 				} else {
 					if (searchPage >= 0 && searchPage < pageCount) {
 						pageLabel.setText((searchPage+1) + " / " + pageCount);
@@ -609,13 +607,13 @@ public class DocumentActivity extends FragmentActivity
 			public void run() {
 				readerView = findViewById(R.id.reader_view);
 				readerView.setActionListener(actionListener);
-				readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), mContext, doc, actionListener));
+				readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
-				loadPageUpdate(currentPage);
+				loadOrUpdatePage(currentPage);
 				loadOutline();
 
 			}
@@ -638,7 +636,10 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				loadPageUpdate(currentPage);
+				updatePageNumberInfo(currentPage);
+				readerView.getAdapter().notifyDataSetChanged();
+				loadOrUpdatePage(currentPage);
+				Log.i("mytag", "doc count: "+pageCount+"; adapter count: "+readerView.getAdapter().getCount());
 				loadOutline();
 			}
 		});
@@ -706,7 +707,11 @@ public class DocumentActivity extends FragmentActivity
 		}
 	}
 
-	private void loadPageUpdate(int p) {
+	/*
+	If we have not cached pages - it will be drawn with actual info
+	If we have cached pages - we need redraw it to display current state (search hits for example)
+	 */
+	private void loadOrUpdatePage(int p) {
 		readerView.setCurrentItem(p);
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
@@ -725,6 +730,7 @@ public class DocumentActivity extends FragmentActivity
 		gotoPage(doc.pageNumberFromLocation(doc.resolveLink(uri)));
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.N)
 	public void gotoURI(String uri) {
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET); // FLAG_ACTIVITY_NEW_DOCUMENT in API>=21

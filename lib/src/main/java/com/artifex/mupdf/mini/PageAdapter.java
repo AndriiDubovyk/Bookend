@@ -17,16 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PageAdapter extends FragmentStatePagerAdapter {
-    private final Context mContext;
-    private final Document mDoc;
     private final DocumentActivity actionListener;
     private PageFragment mCurrentPageFragment;
     private HashMap<Integer, Fragment> cache = new HashMap<Integer, Fragment>();
 
-    public PageAdapter(FragmentManager fm, Context c, Document d, DocumentActivity da) {
+    public PageAdapter(FragmentManager fm, DocumentActivity da) {
         super(fm);
-        mContext = c;
-        mDoc = d;
         actionListener = da;
     }
 
@@ -45,7 +41,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         Bundle arguments = new Bundle();
         arguments.putInt(PageFragment.PAGE_NUMBER, position);
 
-        PageFragment fragment = new PageFragment(mDoc, actionListener);
+        PageFragment fragment = new PageFragment(actionListener);
         fragment.setArguments(arguments);
         cache.put(position, fragment);
         return fragment;
@@ -69,6 +65,6 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return mDoc.countPages();
+        return actionListener.pageCount;
     }
 }
