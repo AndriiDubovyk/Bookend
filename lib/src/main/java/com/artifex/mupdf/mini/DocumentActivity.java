@@ -327,8 +327,10 @@ public class DocumentActivity extends FragmentActivity
 				if (id == R.id.font_size_4) cssManager.fontSize=4;
 				else if (id == R.id.font_size_9) cssManager.fontSize = 9;
 				else if (id == R.id.font_size_10) cssManager.fontSize = 10;
-				else if (id == R.id.font_size_11) cssManager.fontSize = 11;
 				else if (id == R.id.font_size_12) cssManager.fontSize = 12;
+				else if (id == R.id.font_size_13) cssManager.fontSize = 13;
+				else if (id == R.id.font_size_14) cssManager.fontSize = 14;
+				else if (id == R.id.font_size_15) cssManager.fontSize = 15;
 				if (oldFontSize != cssManager.fontSize)
 					reopenDocument();
 				return true;
@@ -414,7 +416,8 @@ public class DocumentActivity extends FragmentActivity
 	 */
 	protected void reopenDocument() {
 		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
-		long mark = doc.makeBookmark(doc.locationFromPageNumber(currentPage));
+		int prevPage = currentPage;
+		int prevPageCount = pageCount;
 		worker.add(new Worker.Task() {
 			boolean needsPassword;
 			public void work() {
@@ -425,7 +428,7 @@ public class DocumentActivity extends FragmentActivity
 					doc = Document.openDocument(stream, mimetype);;
 			}
 			public void run() {
-				reloadDocument(mark);
+				reloadDocument(prevPage, prevPageCount);
 			}
 		});
 	}
@@ -625,7 +628,7 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	protected void reloadDocument(long mark) {
+	protected void reloadDocument(int prevPage, int prevPageCount) {
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
@@ -639,7 +642,11 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, layoutEm);
 					}
 					pageCount = doc.countPages();
-					currentPage = doc.pageNumberFromLocation(doc.findBookmark(mark));
+					float readProgress = ((float) prevPage) / prevPageCount;
+					Log.i("mytag", "rp: "+readProgress);
+					currentPage = Math.round(readProgress*pageCount);
+					if(currentPage<0) currentPage = 0;
+					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -651,9 +658,7 @@ public class DocumentActivity extends FragmentActivity
 				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
-				titleLabel.setText(title);
-				if (isReflowable)
-					layoutButton.setVisibility(View.VISIBLE);
+				Log.i("mytag", "reloadDocument page2: "+currentPage);
 				readerView.setCurrentItem(currentPage, false);
 				updatePageNumberInfo(currentPage);
 				loadOutline();

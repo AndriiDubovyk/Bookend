@@ -3,6 +3,8 @@
 	<item android:id="@+id/font_size_4" android:title="4" />
 	<item android:id="@+id/font_size_9" android:title="9" />
 	<item android:id="@+id/font_size_10" android:title="10" />
-	<item android:id="@+id/font_size_11" android:title="11" />
 	<item android:id="@+id/font_size_12" android:title="12" />
+	<item android:id="@+id/font_size_13" android:title="13" />
+	<item android:id="@+id/font_size_14" android:title="14" />
+	<item android:id="@+id/font_size_15" android:title="15" />
 </menu>
