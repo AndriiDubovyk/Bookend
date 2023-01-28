@@ -614,7 +614,7 @@ public class DocumentActivity extends FragmentActivity
 					layoutButton.setVisibility(View.VISIBLE);
 				readerView.setAdapter(readerView.getAdapter());
 				readerView.setCurrentItem(currentPage, false);
-
+				updatePageNumberInfo(currentPage);
 				loadOutline();
 
 			}
@@ -743,6 +743,18 @@ public class DocumentActivity extends FragmentActivity
 
 	public void gotoPage(String uri) {
 		gotoPage(doc.pageNumberFromLocation(doc.resolveLink(uri)));
+	}
+
+	public void goBackward() {
+		if(currentPage>0) {
+			readerView.setCurrentItem(currentPage-1, true);
+		}
+	}
+
+	public void goForward() {
+		if(currentPage<pageCount-1) {
+			readerView.setCurrentItem(currentPage+1, true);
+		}
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.N)

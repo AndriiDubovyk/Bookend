@@ -45,7 +45,7 @@ public class PageView extends View implements
 	protected Paint linkPaint;
 	protected Paint searchHitPaint;
 
-	private static int BACKGROUND_COLOR = 0xFFE7DDD0;
+	public static int BACKGROUND_COLOR = 0xFFE7DDD0;
 	private static int INK_COLOR = 0xFF302B25;
 
 	private static int ERROR_PAINT_COLOR = 0xffff5050;
@@ -224,10 +224,11 @@ public class PageView extends View implements
 			}
 		}
 		if (!foundLink) {
+
 			float a = canvasW / 3;
 			float b = a * 2;
-//			if (x <= a) goBackward();
-//			if (x >= b) goForward();
+			if (x <= a) actionListener.goBackward();
+			if (x >= b) actionListener.goForward();
 			if (x > a && x < b && actionListener != null) actionListener.toggleUI();
 		}
 		invalidate();

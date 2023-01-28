@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import java.lang.reflect.Field;
+
 public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
     private DocumentActivity actionListener;
@@ -57,6 +59,7 @@ public class ReaderView extends ViewPager {
 
 
     private void setup(Context context) {
+        setBackgroundColor(PageView.BACKGROUND_COLOR);
         setPageTransformer(true, new com.artifex.mupdf.mini.PageTransformer());
         addOnPageChangeListener(new OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
@@ -68,5 +71,7 @@ public class ReaderView extends ViewPager {
             }
         });
     }
+
+
 
 }
