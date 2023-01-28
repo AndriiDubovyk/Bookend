@@ -34,6 +34,8 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager.widget.PagerAdapter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -91,12 +93,10 @@ public class DocumentActivity extends FragmentActivity
 	protected String searchNeedle;
 	protected boolean stopSearch;
 	protected Stack<Integer> history;
-	protected boolean wentBack;
 	private DocumentActivity actionListener;
 
 	public String getSearchNeedle() { return searchNeedle; }
 	public void setStopSearch(boolean v) { stopSearch=v; }
-	public boolean getWentBack() { return wentBack; }
 	public float getPageZoom() { return pageZoom; }
 	public int getCanvasW() { return canvasW; }
 	public int getCanvasH() { return canvasH; }
@@ -401,7 +401,6 @@ public class DocumentActivity extends FragmentActivity
 	public void onPageViewZoomChanged(float zoom) {
 		if (zoom != pageZoom) {
 			pageZoom = zoom;
-			loadOrUpdatePage(currentPage);
 		}
 	}
 
@@ -494,7 +493,6 @@ public class DocumentActivity extends FragmentActivity
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
 		pageSeekbar.setProgress(currentPage);
-		wentBack = false;
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {
@@ -520,7 +518,6 @@ public class DocumentActivity extends FragmentActivity
 		searchHitPage = -1;
 		searchNeedle = null;
 		readerView.updateCachedPages();
-		//pageView.resetHits();
 	}
 
 	protected void runSearch(final int startPage, final int direction, final String needle) {
@@ -583,6 +580,9 @@ public class DocumentActivity extends FragmentActivity
 				runSearch(startPage, direction, searchNeedle);
 	}
 
+	/**
+	 * Load required document data
+	 */
 	protected void loadDocument() {
 		worker.add(new Worker.Task() {
 			public void work() {
@@ -605,19 +605,25 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				Log.i("mytag", "saved page: "+currentPage);
 				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
-				loadOrUpdatePage(currentPage);
+				readerView.setAdapter(readerView.getAdapter());
+				readerView.setCurrentItem(currentPage, false);
+
 				loadOutline();
 
 			}
 		});
 	}
 
+	/**
+	 * Rework pages layout after we change page or font size
+	 */
 	protected void relayoutDocument() {
 		worker.add(new Worker.Task() {
 			public void work() {
@@ -686,6 +692,7 @@ public class DocumentActivity extends FragmentActivity
 		actionBar.setVisibility(View.VISIBLE);
 		searchBar.setVisibility(View.GONE);
 		hideKeyboard();
+		searchText.setText("");
 		resetSearch();
 	}
 
@@ -710,17 +717,27 @@ public class DocumentActivity extends FragmentActivity
 	If we have cached pages - we need redraw it to display current state (search hits for example)
 	 */
 	private void loadOrUpdatePage(int p) {
-		readerView.setCurrentItem(p);
+		Log.i("mytag", "loadOrUpdatePage: "+p);
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
 		currentPage = p;
+		gotoPage(currentPage);
 	}
 
 	public void gotoPage(int p) {
+		Log.i("mytag", "gotoPage: "+p);
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			history.push(currentPage);
 			currentPage = p;
-			readerView.setCurrentItem(p);
+
+			/**
+			 * Temporary solution
+			 * By some cause serCurrentItem(p) or serCurrentItem(p, true) work perfectly.
+			 * But serCurrentItem(p, false) work only if we reattach adapter
+			 */
+			readerView.setAdapter(readerView.getAdapter());
+			readerView.setCurrentItem(p, false);
+
 		}
 	}
 

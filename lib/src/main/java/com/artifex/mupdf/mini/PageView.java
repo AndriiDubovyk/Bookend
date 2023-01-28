@@ -34,7 +34,7 @@ public class PageView extends View implements
 	protected int scrollX, scrollY;
 	protected Link[] links;
 	protected Quad[][] hits;
-	protected boolean showLinks;
+	protected boolean showLinks = true; // links enabled by default
 
 	protected GestureDetector detector;
 	protected ScaleGestureDetector scaleDetector;
@@ -50,7 +50,7 @@ public class PageView extends View implements
 
 	private static int ERROR_PAINT_COLOR = 0xffff5050;
 	private static int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
-	private static int LINK_PAINT_COLOR = 0x200000ff;
+	private static int LINK_PAINT_COLOR = 0x00ffffff;
 
 	public PageView(Context ctx, AttributeSet atts) {
 		super(ctx, atts);
@@ -99,7 +99,7 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	private void setBitmap(Bitmap b, float zoom, boolean wentBack, Link[] ls, Quad[][] hs) {
+	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs) {
 		if (bitmap != null)
 			bitmap.recycle();
 		error = false;
@@ -110,8 +110,8 @@ public class PageView extends View implements
 		bitmapH = (int)(bitmap.getHeight() * viewScale / zoom);
 		scroller.forceFinished(true);
 		if (pageScale == zoom) {
-			scrollX = wentBack ? bitmapW - canvasW : 0;
-			scrollY = wentBack ? bitmapH - canvasH : 0;
+			scrollX = 0;
+			scrollY = 0;
 		}
 		pageScale = zoom;
 		invalidate();
@@ -154,11 +154,11 @@ public class PageView extends View implements
 			}
 			public void run() {
 				if (bitmap != null) {
-					setBitmap(bitmap, zoom, actionListener.getWentBack(), links, hits);
+					setBitmap(bitmap, zoom, links, hits);
+					Log.i("mytag", "draw page: "+pageNumber);
 				} else {
 					setError();
 				}
-
 			}
 		});
 	}
@@ -170,11 +170,6 @@ public class PageView extends View implements
 		Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		result.setPixels(src.getPixels(), 0, width, 0, 0, width, height);
 		return result;
-	}
-
-	public void resetHits() {
-		hits = null;
-		invalidate();
 	}
 
 	public void onSizeChanged(int w, int h, int ow, int oh) {
@@ -195,10 +190,10 @@ public class PageView extends View implements
 		return true;
 	}
 
+
 	public void onShowPress(MotionEvent e) { }
 
 	public void onLongPress(MotionEvent e) {
-		switchLinks(); // activte/deactivate link displaying and following
 		invalidate();
 	}
 
@@ -328,9 +323,11 @@ public class PageView extends View implements
 			y = -scrollY;
 		}
 
+		// Draw main page contetn
 		dst.set(x, y, x + bitmapW, y + bitmapH);
 		canvas.drawBitmap(bitmap, null, dst, null);
 
+		// Draw links background
 		if (showLinks && links != null && links.length > 0) {
 			for (Link link : links) {
 				Rect b = link.bounds;
@@ -344,6 +341,7 @@ public class PageView extends View implements
 			}
 		}
 
+		// Draw search hits
 		if (hits != null && hits.length > 0) {
 			for (Quad[] h : hits)
 				for (Quad q : h) {
@@ -356,5 +354,6 @@ public class PageView extends View implements
 					canvas.drawPath(path, searchHitPaint);
 				}
 		}
+
 	}
 }

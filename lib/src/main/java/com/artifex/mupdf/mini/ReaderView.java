@@ -45,6 +45,11 @@ public class ReaderView extends ViewPager {
         ((PageAdapter)getAdapter()).updateCachedPages();
     }
 
+    @Override
+    public void setCurrentItem(int item, boolean smoothScroll) {
+        super.setCurrentItem(item, smoothScroll);
+        Log.i("mytag", "setCurrentItem "+item);
+    }
 
     public void setActionListener(DocumentActivity da) {
         actionListener = da;
@@ -52,8 +57,7 @@ public class ReaderView extends ViewPager {
 
 
     private void setup(Context context) {
-        //FragmentManager fm =  ((FragmentActivity) context).getSupportFragmentManager();
-        setPageTransformer(true, new SlideStackPageTransformer());
+        setPageTransformer(true, new com.artifex.mupdf.mini.PageTransformer());
         addOnPageChangeListener(new OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}

@@ -2,6 +2,7 @@ package com.artifex.mupdf.mini;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         PageFragment fragment = new PageFragment(actionListener);
         fragment.setArguments(arguments);
         cache.put(position, fragment);
+        Log.i("mytag", "create page item "+position);
         return fragment;
     }
 

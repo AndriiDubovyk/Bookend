@@ -4,7 +4,10 @@ import android.view.View;
 
 import androidx.viewpager.widget.ViewPager;
 
-public class SlideStackPageTransformer implements ViewPager.PageTransformer {
+/**
+ * Represents page swipe animation
+ */
+public class PageTransformer implements ViewPager.PageTransformer {
     private static final float MIN_SCALE = 1f;
     private static final float MIN_ALPHA = 0f;
 
