@@ -17,8 +17,14 @@ import java.lang.reflect.Field;
 public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
     private DocumentActivity actionListener;
+    private float initialXValue;
+    private SwipeDirection direction;
     private float zoom = 1f;
-    private boolean enabled = true;
+
+
+    enum SwipeDirection {
+        ALL, LEFT, RIGHT, NONE ;
+    }
 
     public ReaderView(@NonNull Context context) {
         super(context);
@@ -88,6 +94,7 @@ public class ReaderView extends ViewPager {
 
 
     private void setup(Context context) {
+        this.direction = SwipeDirection.ALL;
         setBackgroundColor(PageView.BACKGROUND_COLOR);
         setPageTransformer(true, new com.artifex.mupdf.mini.PageTransformer());
         addOnPageChangeListener(new OnPageChangeListener() {
@@ -102,7 +109,7 @@ public class ReaderView extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (this.enabled) {
+        if (this.isSwipeAllowed(event)) {
             return super.onTouchEvent(event);
         }
 
@@ -111,17 +118,41 @@ public class ReaderView extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (this.enabled) {
+        if (this.isSwipeAllowed(event)) {
             return super.onInterceptTouchEvent(event);
         }
 
         return false;
     }
 
-    public void setPagingEnabled(boolean enabled) {
-        this.enabled = enabled;
+    private boolean isSwipeAllowed(MotionEvent event) {
+        if(this.direction == SwipeDirection.ALL) return true;
+
+        if(direction == SwipeDirection.NONE )//disable any swipe
+            return false;
+
+        if(event.getAction()==MotionEvent.ACTION_DOWN) {
+            initialXValue = event.getX();
+            return true;
+        }
+
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            float diffX = event.getX() - initialXValue;
+            if (diffX > 0 && direction == SwipeDirection.RIGHT) {
+                // swipe from left to right detected
+                return false;
+            } else if (diffX < 0 && direction == SwipeDirection.LEFT) {
+                // swipe from right to left detected
+                return false;
+            }
+        }
+
+        return true;
     }
 
+    public void setAllowedSwipeDirection(SwipeDirection direction) {
+        this.direction = direction;
+    }
 
 
 }

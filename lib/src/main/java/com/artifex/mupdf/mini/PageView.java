@@ -266,12 +266,14 @@ public class PageView extends View implements
 	}
 
 	public void controlPaging() {
-		if(scrollX<=0) {
-			actionListener.readerView.setPagingEnabled(true);
+		if(viewScale <= 1f) {
+			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.ALL);
+		}else if(scrollX<=0) {
+			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.LEFT);
 		} else if (scrollX+canvasW>=bitmapW) {
-			actionListener.readerView.setPagingEnabled(true);
+			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.RIGHT);
 		} else  {
-			actionListener.readerView.setPagingEnabled(false);
+			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.NONE);
 		}
 		actionListener.setCurrentPageScroll(scrollX, scrollY);
 	}
