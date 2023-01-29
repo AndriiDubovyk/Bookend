@@ -52,7 +52,13 @@ public class DocumentActivity extends FragmentActivity
 	public static Document doc;
 
 	private Context mContext;
+
+	// We must keep all this info for cases with screen size change
 	protected String key;
+	private static final String CURRENT_PAGE = "CURRENT_PAGE";
+	private static final String PAGE_COUNT = "PAGE_COUNT";
+	private int oldPageCount;
+
 	protected String mimetype;
 	protected SeekableInputStream stream;
 	protected byte[] buffer;
@@ -229,11 +235,8 @@ public class DocumentActivity extends FragmentActivity
 		worker = new Worker(this);
 		worker.start();
 
-		prefs = getPreferences(Context.MODE_PRIVATE);
-		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
-		Log.i("mytag", "css: "+cssManager.getCSS());
+		loadPrefs();
 		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
-		currentPage = prefs.getInt(key, 0);
 		searchHitPage = -1;
 		hasLoaded = false;
 
@@ -340,6 +343,13 @@ public class DocumentActivity extends FragmentActivity
 		readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
 	}
 
+	private void loadPrefs() {
+		prefs = getPreferences(Context.MODE_PRIVATE);
+		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
+		currentPage = prefs.getInt(key+CURRENT_PAGE, 0);
+		oldPageCount = prefs.getInt(key+PAGE_COUNT, 0);
+	}
+
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_PAGE_UP:
@@ -365,6 +375,9 @@ public class DocumentActivity extends FragmentActivity
 		return super.onKeyUp(keyCode, event);
 	}
 
+
+	private int oldW = 0;
+	private int oldH = 0;
 	public void onPageViewSizeChanged(int w, int h) {
 		pageZoom = 1;
 		canvasW = w;
@@ -374,9 +387,13 @@ public class DocumentActivity extends FragmentActivity
 		if (!hasLoaded) {
 			hasLoaded = true;
 			openDocument();
+		} else if(isReflowable && oldW != w || oldH != h) {
+			relayoutDocument();
 		} else if(!isReflowable) {
 			loadOrUpdatePage(currentPage);
 		}
+		oldW = w;
+		oldH = h;
 	}
 
 	public void onPageViewZoomChanged(float zoom) {
@@ -401,6 +418,28 @@ public class DocumentActivity extends FragmentActivity
 					askPassword(R.string.dlog_password_message);
 				else
 					loadDocument();
+			}
+		});
+	}
+
+	protected void relayoutDocument() {
+		worker.add(new Worker.Task() {
+			public void work() {
+				try {
+					long mark = doc.makeBookmark(doc.locationFromPageNumber(currentPage));
+					Log.i(APP, "relayout document");
+					doc.layout(layoutW, layoutH, LAYOUT_EM);
+					pageCount = doc.countPages();
+					currentPage = doc.pageNumberFromLocation(doc.findBookmark(mark));
+				} catch (Throwable x) {
+					pageCount = 1;
+					currentPage = 0;
+					throw x;
+				}
+			}
+			public void run() {
+				loadOrUpdatePage(currentPage);
+				loadOutline();
 			}
 		});
 	}
@@ -472,9 +511,14 @@ public class DocumentActivity extends FragmentActivity
 
 	public void onPause() {
 		super.onPause();
+		savePrefs();
+	}
+
+	private void savePrefs() {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt("fontSize", cssManager.fontSize);
-		editor.putInt(key, currentPage);
+		editor.putInt(key+CURRENT_PAGE, currentPage);
+		editor.putInt(key+PAGE_COUNT, pageCount);
 		editor.apply();
 	}
 
@@ -600,6 +644,12 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
+					if(oldPageCount!=pageCount) {
+						float readProgress = ((float) currentPage) / oldPageCount;
+						currentPage = Math.round(readProgress*pageCount);
+						if(currentPage<0) currentPage = 0;
+						else if (currentPage>=pageCount) currentPage=pageCount-1;
+					}
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -637,7 +687,6 @@ public class DocumentActivity extends FragmentActivity
 					}
 					pageCount = doc.countPages();
 					float readProgress = ((float) prevPage) / prevPageCount;
-					Log.i("mytag", "rp: "+readProgress);
 					currentPage = Math.round(readProgress*pageCount);
 					if(currentPage<0) currentPage = 0;
 					else if (currentPage>=pageCount) currentPage=pageCount-1;
@@ -652,7 +701,6 @@ public class DocumentActivity extends FragmentActivity
 				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
-				Log.i("mytag", "reloadDocument page2: "+currentPage);
 				readerView.setCurrentItem(currentPage, false);
 				updatePageNumberInfo(currentPage);
 				loadOutline();
@@ -735,7 +783,6 @@ public class DocumentActivity extends FragmentActivity
 	If we have cached pages - we need redraw it to display current state (search hits for example)
 	 */
 	private void loadOrUpdatePage(int p) {
-		Log.i("mytag", "loadOrUpdatePage: "+p);
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
 		currentPage = p;
@@ -746,7 +793,6 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void gotoPage(int p) {
-		Log.i("mytag", "gotoPage: "+p);
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			history.push(currentPage);
 			currentPage = p;

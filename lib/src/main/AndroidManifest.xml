@@ -7,7 +7,7 @@
     <application>
         <activity
             android:name=".DocumentActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden"
             android:exported="true"
             android:hardwareAccelerated="false"
             android:label="MuPDF mini">
