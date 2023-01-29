@@ -378,6 +378,7 @@ public class DocumentActivity extends FragmentActivity
 	private int oldW = 0;
 	private int oldH = 0;
 	public void onPageViewSizeChanged(int w, int h) {
+		readerView.setZoomWithoutUpdate(1);
 		canvasW = w;
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
@@ -385,10 +386,8 @@ public class DocumentActivity extends FragmentActivity
 		if (!hasLoaded) {
 			hasLoaded = true;
 			openDocument();
-		} else if(isReflowable && oldW != w || oldH != h) {
+		} else if(!isReflowable &&oldW != w || oldH != h) {
 			relayoutDocument();
-		} else if(!isReflowable) {
-			loadOrUpdatePage(currentPage);
 		}
 		oldW = w;
 		oldH = h;

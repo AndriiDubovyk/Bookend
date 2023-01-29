@@ -38,6 +38,10 @@ public class ReaderView extends ViewPager {
         ((PageAdapter)getAdapter()).updateCachedPagesZoom(newZoom);
     }
 
+    public void setZoomWithoutUpdate(float newZoom) {
+        zoom = newZoom;
+    }
+
     public float getZoom() {
         return zoom;
     }

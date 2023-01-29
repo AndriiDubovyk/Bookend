@@ -25,7 +25,10 @@ public class PageView extends View implements
 {
 	protected DocumentActivity actionListener;
 
-	protected float pageScale, viewScale, minScale, maxScale;
+
+	private static final float MIN_SCALE = 1;
+	private static final float MAX_SCALE = 8;
+	protected float pageScale, viewScale;
 	protected Bitmap bitmap;
 	protected int bitmapW, bitmapH;
 	protected int canvasW, canvasH;
@@ -50,6 +53,7 @@ public class PageView extends View implements
 	private static int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
 	private static int LINK_PAINT_COLOR = 0x00ffffff;
 
+
 	public PageView(Context ctx, AttributeSet atts) {
 		super(ctx, atts);
 		setBackgroundColor(BACKGROUND_COLOR);
@@ -59,8 +63,6 @@ public class PageView extends View implements
 
 		pageScale = 1;
 		viewScale = 1;
-		minScale = 1;
-		maxScale = 4;
 
 		linkPaint = new Paint();
 		linkPaint.setColor(LINK_PAINT_COLOR);
@@ -257,8 +259,8 @@ public class PageView extends View implements
 		if (bitmap != null) {
 			float scaleFactor = det.getScaleFactor();
 			float newViewScale = viewScale * scaleFactor;
-			if (newViewScale < minScale) newViewScale = minScale;
-			if (newViewScale > maxScale) newViewScale = maxScale;
+			if (newViewScale < MIN_SCALE) newViewScale = MIN_SCALE;
+			if (newViewScale > MAX_SCALE) newViewScale = MAX_SCALE;
 			setPageZoom(newViewScale);
 			invalidate();
 		}

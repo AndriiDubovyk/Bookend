@@ -9,7 +9,7 @@ import androidx.viewpager.widget.ViewPager;
  */
 public class PageTransformer implements ViewPager.PageTransformer {
     private static final float MIN_SCALE = 1f;
-    private static final float MIN_ALPHA = 0f;
+    private static final float MIN_ALPHA = 1f;
 
     public void transformPage(View view, float position) {
         int pageWidth = view.getWidth();
@@ -17,18 +17,24 @@ public class PageTransformer implements ViewPager.PageTransformer {
 
         if (position < -1) { // [-Infinity,-1)
             // This page is way off-screen to the left.
-            view.setAlpha(MIN_ALPHA);
+            view.setAlpha(0);
 
         } else if (position <= 0) { // [-1,0]
             // Use the default slide transition when moving to the left page
+            //float alpha = 1 - position + MIN_ALPHA;
+            //view.setAlpha(alpha<1 ? alpha : 1);
             view.setAlpha(1f);
+
             view.setTranslationX(0f);
             view.setScaleX(1f);
             view.setScaleY(1f);
 
         } else if (position <= 1) { // (0,1]
             // Fade the page out.
-            view.setAlpha(1 - position + MIN_ALPHA);
+//            float alpha = 1 - position + MIN_ALPHA;
+//            view.setAlpha(alpha<1 ? alpha : 1);
+            
+            view.setAlpha(1f);
 
             // Counteract the default slide transition
             view.setTranslationX(pageWidth * -position);
