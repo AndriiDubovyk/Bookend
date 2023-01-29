@@ -156,7 +156,7 @@ public class PageView extends View implements
 			public void run() {
 				if (bitmap != null) {
 					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits);
-					setPageZoom(actionListener.getCommonZoom());
+					if(!isActivePage()) setPageZoom(actionListener.getCommonZoom());
 				} else {
 					setError();
 				}
@@ -257,6 +257,11 @@ public class PageView extends View implements
 			if(isActivePage()) controlPaging();
 		}
 		return true;
+	}
+
+	public void setPageScroll(int scrollX, int scrollY) {
+		this.scrollX = scrollX;
+		this.scrollY = scrollY;
 	}
 
 	public void controlPaging() {
