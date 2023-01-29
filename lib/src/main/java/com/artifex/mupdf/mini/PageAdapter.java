@@ -38,7 +38,6 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     }
 
     public void updateCachedPagesZoom(float newZoom) {
-        Log.i("mytag", "updateCachedPagesZoom "+newZoom);
         for(Fragment fg : cache.values()) {
             ((PageFragment)fg).setZoom(newZoom);
         }

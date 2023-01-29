@@ -4,6 +4,7 @@ package com.artifex.mupdf.mini;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
     private DocumentActivity actionListener;
     private float zoom = 1f;
+    private boolean enabled = true;
 
     public ReaderView(@NonNull Context context) {
         super(context);
@@ -91,6 +93,28 @@ public class ReaderView extends ViewPager {
                 actionListener.updatePageNumberInfo(position);
             }
         });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (this.enabled) {
+            return super.onTouchEvent(event);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (this.enabled) {
+            return super.onInterceptTouchEvent(event);
+        }
+
+        return false;
+    }
+
+    public void setPagingEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
 

@@ -176,7 +176,7 @@ public class PageView extends View implements
 	public void onSizeChanged(int w, int h, int ow, int oh) {
 		canvasW = w;
 		canvasH = h;
-		if (actionListener != null)
+		if (actionListener != null && isActivePage())
 			actionListener.onPageViewSizeChanged(w, h);
 	}
 
@@ -254,9 +254,21 @@ public class PageView extends View implements
 			scroller.forceFinished(true);
 			scroller.fling(scrollX, scrollY, (int)-dx, (int)-dy, 0, maxX, 0, maxY);
 			invalidate();
+			if(isActivePage()) controlPaging();
 		}
 		return true;
 	}
+
+	public void controlPaging() {
+		if(scrollX<=0) {
+			actionListener.readerView.setPagingEnabled(true);
+		} else if (scrollX+canvasW>=bitmapW) {
+			actionListener.readerView.setPagingEnabled(true);
+		} else  {
+			actionListener.readerView.setPagingEnabled(false);
+		}
+	}
+
 
 	public boolean onScaleBegin(ScaleGestureDetector det) {
 		return true;
@@ -288,8 +300,11 @@ public class PageView extends View implements
 
 
 	public void onScaleEnd(ScaleGestureDetector det) {
-		if (actionListener != null)
+		if (actionListener != null && isActivePage()) {
+			controlPaging();
 			actionListener.onPageViewZoomChanged(viewScale);
+		}
+
 	}
 
 
