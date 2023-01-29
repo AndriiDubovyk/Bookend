@@ -26,8 +26,7 @@ public class PageView extends View implements
 	protected DocumentActivity actionListener;
 
 
-	private static final float MIN_SCALE = 1;
-	private static final float MAX_SCALE = 8;
+
 	protected float pageScale, viewScale;
 	protected Bitmap bitmap;
 	protected int bitmapW, bitmapH;
@@ -45,6 +44,10 @@ public class PageView extends View implements
 	protected Path errorPath;
 	protected Paint linkPaint;
 	protected Paint searchHitPaint;
+
+
+	private static final float MIN_SCALE = 1;
+	private static final float MAX_SCALE = 8;
 
 	public static int BACKGROUND_COLOR = 0xFFf2d3aa;
 	private static int INK_COLOR = 0xFF6e5837;
