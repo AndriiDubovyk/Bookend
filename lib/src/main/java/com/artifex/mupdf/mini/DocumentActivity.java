@@ -63,7 +63,7 @@ public class DocumentActivity extends FragmentActivity
 	protected String title;
 	protected ArrayList<OutlineActivity.Item> flatOutline;
 	protected float layoutW, layoutH;
-	protected float layoutEm = 1;
+	protected static final float LAYOUT_EM = 1;
 	protected float displayDPI;
 	protected int canvasW, canvasH;
 	protected float pageZoom;
@@ -94,12 +94,6 @@ public class DocumentActivity extends FragmentActivity
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
 
-	private String toHex(byte[] digest) {
-		StringBuilder builder = new StringBuilder(2 * digest.length);
-		for (byte b : digest)
-			builder.append(String.format("%02x", b));
-		return builder.toString();
-	}
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
 		ContentResolver cr = getContentResolver();
@@ -551,14 +545,14 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				Log.i("myytag", "search hit page: "+searchHitPage+" current page: "+currentPage);
 				if (stopSearch || needle != searchNeedle) {
 					pageLabel.setText((currentPage+1) + " / " + pageCount);
 				} else if (searchHitPage == currentPage) {
 					loadOrUpdatePage(currentPage);
 				} else if (searchHitPage >= 0) {
 					history.push(currentPage);
-					currentPage = searchHitPage;
-					loadOrUpdatePage(currentPage);
+					loadOrUpdatePage(searchHitPage);
 				} else {
 					if (searchPage >= 0 && searchPage < pageCount) {
 						pageLabel.setText((searchPage+1) + " / " + pageCount);
@@ -603,7 +597,7 @@ public class DocumentActivity extends FragmentActivity
 					isReflowable = doc.isReflowable();
 					if (isReflowable) {
 						Log.i(APP, "layout document");
-						doc.layout(layoutW, layoutH, layoutEm);
+						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
 				} catch (Throwable x) {
@@ -639,7 +633,7 @@ public class DocumentActivity extends FragmentActivity
 					isReflowable = doc.isReflowable();
 					if (isReflowable) {
 						Log.i(APP, "layout document");
-						doc.layout(layoutW, layoutH, layoutEm);
+						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
 					float readProgress = ((float) prevPage) / prevPageCount;
@@ -745,7 +739,11 @@ public class DocumentActivity extends FragmentActivity
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
 		currentPage = p;
-		gotoPage(currentPage);
+		if (p >= 0 && p < pageCount) {
+			history.push(currentPage);
+			currentPage = p;
+			readerView.setCurrentItem(p, false);
+		}
 	}
 
 	public void gotoPage(int p) {
@@ -754,7 +752,6 @@ public class DocumentActivity extends FragmentActivity
 			history.push(currentPage);
 			currentPage = p;
 			readerView.setCurrentItem(p, false);
-
 		}
 	}
 

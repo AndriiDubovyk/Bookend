@@ -155,7 +155,6 @@ public class PageView extends View implements
 			public void run() {
 				if (bitmap != null) {
 					setBitmap(bitmap, zoom, links, hits);
-					Log.i("mytag", "draw page: "+pageNumber);
 				} else {
 					setError();
 				}
@@ -194,6 +193,7 @@ public class PageView extends View implements
 	public void onShowPress(MotionEvent e) { }
 
 	public void onLongPress(MotionEvent e) {
+
 		invalidate();
 	}
 

@@ -20,7 +20,7 @@ import java.util.List;
 public class PageAdapter extends FragmentStatePagerAdapter {
     private final DocumentActivity actionListener;
     private PageFragment mCurrentPageFragment;
-    private HashMap<Integer, Fragment> cache = new HashMap<Integer, Fragment>();
+    private HashMap<Integer, Fragment> cache = new HashMap<Integer, Fragment>(3);
 
     public PageAdapter(FragmentManager fm, DocumentActivity da) {
         super(fm);
@@ -45,7 +45,6 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         PageFragment fragment = new PageFragment(actionListener);
         fragment.setArguments(arguments);
         cache.put(position, fragment);
-        Log.i("mytag", "create page item "+position);
         return fragment;
     }
 
