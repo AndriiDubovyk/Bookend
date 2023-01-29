@@ -99,6 +99,9 @@ public class DocumentActivity extends FragmentActivity
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
 
+	protected int currentPageScrollX = 0;
+	protected int currentPageScrollY = 0;
+
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
 		ContentResolver cr = getContentResolver();
@@ -608,6 +611,12 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 		});
+	}
+
+	public void setCurrentPageScroll(int scrollX, int scrollY) {
+		this.currentPageScrollX = scrollX;
+		this.currentPageScrollY = scrollY;
+		readerView.updateCachedPagesScroll(scrollX, scrollY);
 	}
 
 	protected void search(int direction) {

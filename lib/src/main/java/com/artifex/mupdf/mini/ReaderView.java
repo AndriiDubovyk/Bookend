@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -75,6 +76,10 @@ public class ReaderView extends ViewPager {
 
     public void updateCachedPages() {
         ((PageAdapter)getAdapter()).updateCachedPages();
+    }
+
+    public void updateCachedPagesScroll(int scrollX, int scrollY) {
+        ((PageAdapter)getAdapter()).updateCachedPagesScroll(scrollX, scrollY);
     }
 
     public void setActionListener(DocumentActivity da) {

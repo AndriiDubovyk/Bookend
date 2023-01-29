@@ -43,6 +43,12 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         }
     }
 
+    public void updateCachedPagesScroll(int scrollX, int scrollY) {
+        for(Fragment fg : cache.values()) {
+            ((PageFragment)fg).setPageScroll(scrollX, scrollY);
+        }
+    }
+
     @Override
     public Fragment getItem(int position) {
         Bundle arguments = new Bundle();

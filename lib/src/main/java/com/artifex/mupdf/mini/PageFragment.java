@@ -50,4 +50,8 @@ public class PageFragment extends Fragment {
     public void setZoom(float newZoom) {
         pageView.setPageZoom(newZoom);
     }
+
+    public void setPageScroll(int scrollX, int scrollY) {
+        pageView.setPageScroll(scrollX, scrollY);
+    }
 }
