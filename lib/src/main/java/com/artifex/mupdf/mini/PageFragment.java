@@ -46,4 +46,8 @@ public class PageFragment extends Fragment {
     public void updatePage() {
         pageView.setPage(pageNumber);
     }
+
+    public void setZoom(float newZoom) {
+        pageView.setPageZoom(newZoom);
+    }
 }

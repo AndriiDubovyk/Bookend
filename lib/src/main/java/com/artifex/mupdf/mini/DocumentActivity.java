@@ -72,7 +72,6 @@ public class DocumentActivity extends FragmentActivity
 	protected static final float LAYOUT_EM = 1;
 	protected float displayDPI;
 	protected int canvasW, canvasH;
-	protected float pageZoom;
 
 	protected ReaderView readerView;
 	protected View currentBar;
@@ -379,7 +378,6 @@ public class DocumentActivity extends FragmentActivity
 	private int oldW = 0;
 	private int oldH = 0;
 	public void onPageViewSizeChanged(int w, int h) {
-		pageZoom = 1;
 		canvasW = w;
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
@@ -397,9 +395,13 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onPageViewZoomChanged(float zoom) {
-		if (zoom != pageZoom) {
-			pageZoom = zoom;
-		}
+		Log.i("mytag", "DocumentActivity.onPageViewZoomChanged "+zoom);
+		if(readerView.getZoom()!=zoom)
+			readerView.setZoom(zoom);
+	}
+
+	public float getCommonZoom() {
+		return readerView.getZoom();
 	}
 
 	protected void openDocument() {
@@ -710,7 +712,6 @@ public class DocumentActivity extends FragmentActivity
 
 	public String getSearchNeedle() { return searchNeedle; }
 	public void setStopSearch(boolean v) { stopSearch=v; }
-	public float getPageZoom() { return pageZoom; }
 	public int getCanvasW() { return canvasW; }
 	public int getCanvasH() { return canvasH; }
 	public Worker getWorker() {return worker; }

@@ -19,8 +19,6 @@ import android.widget.Scroller;
 
 import androidx.annotation.RequiresApi;
 
-import java.nio.charset.StandardCharsets;
-
 public class PageView extends View implements
 	GestureDetector.OnGestureListener,
 	ScaleGestureDetector.OnScaleGestureListener
@@ -62,7 +60,7 @@ public class PageView extends View implements
 		pageScale = 1;
 		viewScale = 1;
 		minScale = 1;
-		maxScale = 2;
+		maxScale = 4;
 
 		linkPaint = new Paint();
 		linkPaint.setColor(LINK_PAINT_COLOR);
@@ -109,16 +107,10 @@ public class PageView extends View implements
 		bitmapW = (int)(bitmap.getWidth() * viewScale / zoom);
 		bitmapH = (int)(bitmap.getHeight() * viewScale / zoom);
 		scroller.forceFinished(true);
-		if (pageScale == zoom) {
-			scrollX = 0;
-			scrollY = 0;
-		}
-		pageScale = zoom;
 		invalidate();
 	}
 
 	protected void setPage(int pageNumber) {
-		final float zoom = actionListener.getPageZoom();
 		actionListener.setStopSearch(true);
 		actionListener.getWorker().add(new Worker.Task() {
 			public Bitmap bitmap;
@@ -128,7 +120,7 @@ public class PageView extends View implements
 				try {
 					Log.i(DocumentActivity.APP, "load page " + pageNumber);
 					Page page = DocumentActivity.doc.loadPage(pageNumber);
-					Log.i(DocumentActivity.APP, "draw page " + pageNumber + " zoom=" + zoom);
+					Log.i(DocumentActivity.APP, "draw page " + pageNumber + " zoom=" + actionListener.getCommonZoom());
 					Matrix ctm;
 					ctm = AndroidDrawDevice.fitPageWidth(page, actionListener.getCanvasW());
 					links = page.getLinks();
@@ -142,8 +134,8 @@ public class PageView extends View implements
 								for (Quad chr : hit)
 									chr.transform(ctm);
 					}
-					if (zoom != 1)
-						ctm.scale(zoom);
+					//ctm.scale(zoom);
+
 					Pixmap pixmap = page.toPixmap(ctm, ColorSpace.DeviceBGR, true);
 					pixmap.tint(INK_COLOR, BACKGROUND_COLOR);
 					bitmap = pixmapToBitmap(pixmap);
@@ -154,7 +146,8 @@ public class PageView extends View implements
 			}
 			public void run() {
 				if (bitmap != null) {
-					setBitmap(bitmap, zoom, links, hits);
+					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits);
+					setPageZoom(actionListener.getCommonZoom());
 				} else {
 					setError();
 				}
@@ -262,23 +255,29 @@ public class PageView extends View implements
 
 	public boolean onScale(ScaleGestureDetector det) {
 		if (bitmap != null) {
-			float focusX = det.getFocusX();
-			float focusY = det.getFocusY();
 			float scaleFactor = det.getScaleFactor();
-			float pageFocusX = (focusX + scrollX) / viewScale;
-			float pageFocusY = (focusY + scrollY) / viewScale;
-			viewScale *= scaleFactor;
-			if (viewScale < minScale) viewScale = minScale;
-			if (viewScale > maxScale) viewScale = maxScale;
-			bitmapW = (int)(bitmap.getWidth() * viewScale / pageScale);
-			bitmapH = (int)(bitmap.getHeight() * viewScale / pageScale);
-			scrollX = (int)(pageFocusX * viewScale - focusX);
-			scrollY = (int)(pageFocusY * viewScale - focusY);
-			scroller.forceFinished(true);
+			float newViewScale = viewScale * scaleFactor;
+			if (newViewScale < minScale) newViewScale = minScale;
+			if (newViewScale > maxScale) newViewScale = maxScale;
+			setPageZoom(newViewScale);
 			invalidate();
 		}
 		return true;
 	}
+
+	public void setPageZoom(float scale) {
+		if(viewScale==scale) return;
+		Log.i("mytag", "setScale "+scale);
+		float pageFocusX = (scaleDetector.getFocusX()+ scrollX) / viewScale;
+		float pageFocusY = (scaleDetector.getFocusY() + scrollY) / viewScale;
+		viewScale = scale;
+		bitmapW = (int)(bitmap.getWidth() * viewScale / pageScale);
+		bitmapH = (int)(bitmap.getHeight() * viewScale / pageScale);
+		scrollX = (int)(pageFocusX * viewScale - scaleDetector.getFocusX());
+		scrollY = (int)(pageFocusY * viewScale - scaleDetector.getFocusY());
+		scroller.forceFinished(true);
+	}
+
 
 	public void onScaleEnd(ScaleGestureDetector det) {
 		if (actionListener != null)

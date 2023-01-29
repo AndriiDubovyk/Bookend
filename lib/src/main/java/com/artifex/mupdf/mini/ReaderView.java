@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
     private DocumentActivity actionListener;
+    private float zoom = 1f;
 
     public ReaderView(@NonNull Context context) {
         super(context);
@@ -30,6 +31,15 @@ public class ReaderView extends ViewPager {
     public void setAdapter(@Nullable PagerAdapter adapter) {
         super.setAdapter(adapter);
         pagerAdapter = adapter;
+    }
+
+    public void setZoom(float newZoom) {
+        zoom = newZoom;
+        ((PageAdapter)getAdapter()).updateCachedPagesZoom(newZoom);
+    }
+
+    public float getZoom() {
+        return zoom;
     }
 
     /**
