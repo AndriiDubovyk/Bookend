@@ -139,8 +139,6 @@ public class PageView extends View implements
 								for (Quad chr : hit)
 									chr.transform(ctm);
 					}
-					//ctm.scale(zoom);
-
 					Pixmap pixmap = page.toPixmap(ctm, ColorSpace.DeviceBGR, true);
 					pixmap.tint(INK_COLOR, BACKGROUND_COLOR);
 					bitmap = pixmapToBitmap(pixmap);
@@ -272,7 +270,6 @@ public class PageView extends View implements
 
 	public void setPageZoom(float scale) {
 		if(viewScale==scale) return;
-		Log.i("mytag", "setScale "+scale);
 		float pageFocusX = (scaleDetector.getFocusX()+ scrollX) / viewScale;
 		float pageFocusY = (scaleDetector.getFocusY() + scrollY) / viewScale;
 		viewScale = scale;

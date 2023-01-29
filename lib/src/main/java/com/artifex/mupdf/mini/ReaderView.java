@@ -49,7 +49,7 @@ public class ReaderView extends ViewPager {
     /**
      * Temporary solution
      * By some cause serCurrentItem(p) or serCurrentItem(p, true) work perfectly.
-     * But serCurrentItem(p, false) work only if we reattach adapter
+     * But serCurrentItem(p, false) work only if we reattach adapter before
      */
     @Override
     public void setCurrentItem(int item, boolean smoothScroll) {
@@ -88,7 +88,6 @@ public class ReaderView extends ViewPager {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             public void onPageSelected(int position) {
-                Log.i("mytag", "onPageSelected: "+position);
                 actionListener.updatePageNumberInfo(position);
             }
         });

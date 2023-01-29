@@ -378,7 +378,6 @@ public class DocumentActivity extends FragmentActivity
 	private int oldW = 0;
 	private int oldH = 0;
 	public void onPageViewSizeChanged(int w, int h) {
-		readerView.setZoomWithoutUpdate(1);
 		canvasW = w;
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
@@ -386,7 +385,8 @@ public class DocumentActivity extends FragmentActivity
 		if (!hasLoaded) {
 			hasLoaded = true;
 			openDocument();
-		} else if(!isReflowable &&oldW != w || oldH != h) {
+		} else if(!isReflowable && oldW != w || oldH != h) {
+			readerView.setZoomWithoutUpdate(1);
 			relayoutDocument();
 		}
 		oldW = w;
@@ -394,7 +394,6 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onPageViewZoomChanged(float zoom) {
-		Log.i("mytag", "DocumentActivity.onPageViewZoomChanged "+zoom);
 		if(readerView.getZoom()!=zoom)
 			readerView.setZoom(zoom);
 	}
@@ -590,7 +589,6 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				Log.i("myytag", "search hit page: "+searchHitPage+" current page: "+currentPage);
 				if (stopSearch || needle != searchNeedle) {
 					pageLabel.setText((currentPage+1) + " / " + pageCount);
 				} else if (searchHitPage == currentPage) {
