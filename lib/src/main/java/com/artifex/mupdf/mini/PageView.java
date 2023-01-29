@@ -44,8 +44,9 @@ public class PageView extends View implements
 	protected Path errorPath;
 	protected Paint linkPaint;
 	protected Paint searchHitPaint;
+	private int pageNumber = -1;
 
-
+	private static final float TURN_PAGE_SCREEN_EDGE = 0f;
 	private static final float MIN_SCALE = 1;
 	private static final float MAX_SCALE = 8;
 
@@ -115,7 +116,12 @@ public class PageView extends View implements
 		invalidate();
 	}
 
+	private boolean isActivePage() {
+		return this.pageNumber==actionListener.readerView.getCurrentItem();
+	}
+
 	protected void setPage(int pageNumber) {
+		this.pageNumber = pageNumber;
 		actionListener.setStopSearch(true);
 		actionListener.getWorker().add(new Worker.Task() {
 			public Bitmap bitmap;
@@ -221,10 +227,10 @@ public class PageView extends View implements
 		}
 		if (!foundLink) {
 
-			float a = canvasW / 3;
-			float b = a * 2;
-//			if (x <= a) actionListener.goBackward();
-//			if (x >= b) actionListener.goForward();
+			float a = canvasW * TURN_PAGE_SCREEN_EDGE;
+			float b = canvasW - canvasW*TURN_PAGE_SCREEN_EDGE;
+			if (x < a) actionListener.goBackward();
+			if (x > b) actionListener.goForward();
 			if (x > a && x < b && actionListener != null) actionListener.toggleUI();
 		}
 		invalidate();
