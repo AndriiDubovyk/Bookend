@@ -740,7 +740,6 @@ public class DocumentActivity extends FragmentActivity
 			readerView.getCurrentPageFragment().updatePage();
 		currentPage = p;
 		if (p >= 0 && p < pageCount) {
-			history.push(currentPage);
 			currentPage = p;
 			readerView.setCurrentItem(p, false);
 		}
