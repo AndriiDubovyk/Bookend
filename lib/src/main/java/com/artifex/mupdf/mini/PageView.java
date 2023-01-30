@@ -298,7 +298,7 @@ public class PageView extends View implements
 		return true;
 	}
 
-	public void setPageZoom(float scale) {
+	private void setPageZoomProcces(float scale) {
 		if(viewScale==scale) return;
 		float pageFocusX = (scaleDetector.getFocusX()+ scrollX) / viewScale;
 		float pageFocusY = (scaleDetector.getFocusY() + scrollY) / viewScale;
@@ -308,6 +308,19 @@ public class PageView extends View implements
 		scrollX = (int)(pageFocusX * viewScale - scaleDetector.getFocusX());
 		scrollY = (int)(pageFocusY * viewScale - scaleDetector.getFocusY());
 		scroller.forceFinished(true);
+	}
+
+	public void setPageZoom(float scale) {
+		if(isActivePage()) { setPageZoomProcces(scale);}
+		else {
+			actionListener.getWorker().add(new Worker.Task() {
+				public void work() {
+					try { setPageZoomProcces(scale);}
+					catch (Throwable x) {Log.i(DocumentActivity.APP, x.getMessage());}
+				}
+				public void run() {}
+			});
+		}
 	}
 
 

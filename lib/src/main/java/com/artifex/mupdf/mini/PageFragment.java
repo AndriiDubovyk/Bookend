@@ -1,13 +1,10 @@
 package com.artifex.mupdf.mini;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
-import com.artifex.mupdf.fitz.Document;
 
 public class PageFragment extends Fragment {
 
@@ -26,7 +23,7 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_screen_slide_page, container, false);
+                R.layout.page_fragment, container, false);
         root = rootView;
         pageView = root.findViewById(R.id.page_view_fragment);
         Bundle arguments = getArguments();
