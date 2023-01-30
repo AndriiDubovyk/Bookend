@@ -1,5 +1,6 @@
 package com.artifex.mupdf.mini;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 
 public class OutlineActivity extends ListActivity
 {
+
 	public static class Item implements Serializable {
 		public String title;
 		public String uri;
@@ -50,6 +52,7 @@ public class OutlineActivity extends ListActivity
 		if (found >= 0)
 			setSelection(found);
 	}
+
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Item item = adapter.getItem(position);

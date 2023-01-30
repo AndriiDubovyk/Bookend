@@ -207,6 +207,7 @@ public class PageView extends View implements
 		boolean foundLink = false;
 		float x = e.getX();
 		float y = e.getY();
+		checkFragmentsForClose(x, y);
 		if (showLinks && links != null) {
 			float dx = (bitmapW <= canvasW) ? (bitmapW - canvasW) / 2 : scrollX;
 			float dy = (bitmapH <= canvasH) ? (bitmapH - canvasH) / 2 : scrollY;
@@ -234,6 +235,17 @@ public class PageView extends View implements
 		}
 		invalidate();
 		return true;
+	}
+
+	private void checkFragmentsForClose(float x, float y) {
+		if (actionListener.contentFragment!=null)
+		{
+			android.graphics.Rect r = new android.graphics.Rect ( 0, 0, 0, 0 );
+			actionListener.contentFragment.getView().getHitRect(r);
+			Log.i("mytagg", "x: "+x+" y "+y+"  "+r);
+			boolean intersects = r.contains ( (int) x, (int) y );
+			if ( intersects ) actionListener.closeContentFragment();
+		}
 	}
 
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float dx, float dy) {

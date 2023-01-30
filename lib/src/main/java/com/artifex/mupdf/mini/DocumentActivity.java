@@ -21,6 +21,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -69,7 +70,7 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean hasLoaded;
 	protected boolean isReflowable;
 	protected String title;
-	protected ArrayList<OutlineActivity.Item> flatOutline;
+	protected ArrayList<ContentFragment.Item> flatOutline;
 	protected float layoutW, layoutH;
 	protected static final float LAYOUT_EM = 1;
 	protected float displayDPI;
@@ -103,7 +104,7 @@ public class DocumentActivity extends FragmentActivity
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
 
-	private ContentFragment contentFragment;
+	protected ContentFragment contentFragment;
 
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
@@ -159,9 +160,9 @@ public class DocumentActivity extends FragmentActivity
 		displayDPI = metrics.densityDpi;
 
 		setContentView(R.layout.document_activity);
-
-
 		cssManager = new CSSManager();
+
+
 		actionBar = findViewById(R.id.action_bar);
 		searchBar = findViewById(R.id.search_bar);
 		navigationBar = findViewById(R.id.navigation_bar);
@@ -322,13 +323,16 @@ public class DocumentActivity extends FragmentActivity
 				// Create new fragment and transaction
 				if(contentFragment==null) {
 					contentFragment = new ContentFragment();
+					Bundle bundle = new Bundle();
+					bundle.putInt("POSITION", currentPage);
+					bundle.putSerializable("OUTLINE", flatOutline);
+					contentFragment.setArguments(bundle);
 					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 					ft.setReorderingAllowed(true);
 					ft.replace(R.id.side_menu_container, contentFragment);
 					ft.commit();
 				} else {
-					getSupportFragmentManager().beginTransaction().remove(contentFragment).commit();
-					contentFragment = null;
+					closeContentFragment();
 				}
 			}
 		});
@@ -546,7 +550,10 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onBackPressed() {
-		if (history.empty()) {
+		if(contentFragment!=null) {
+			getSupportFragmentManager().beginTransaction().remove(contentFragment).commit();
+			contentFragment = null;
+		}else if (history.empty()) {
 			super.onBackPressed();
 			if (returnToLibraryActivity) {
 				Intent intent = getPackageManager().getLaunchIntentForPackage(getComponentName().getPackageName());
@@ -556,6 +563,11 @@ public class DocumentActivity extends FragmentActivity
 			currentPage = history.pop();
 			loadOrUpdatePage(currentPage);
 		}
+	}
+
+	public void closeContentFragment() {
+		getSupportFragmentManager().beginTransaction().remove(contentFragment).commit();
+		contentFragment = null;
 	}
 
 	public void updatePageNumberInfo(int newPageNumber) {
@@ -748,7 +760,7 @@ public class DocumentActivity extends FragmentActivity
 					if (node.title != null)
 					{
 						int outlinePage = doc.pageNumberFromLocation(doc.resolveLink(node));
-						flatOutline.add(new OutlineActivity.Item(indent + node.title, node.uri, outlinePage));
+						flatOutline.add(new ContentFragment.Item(indent + node.title, node.uri, outlinePage));
 					}
 					if (node.down != null)
 						flattenOutline(node.down, indent + "    ");
@@ -758,7 +770,7 @@ public class DocumentActivity extends FragmentActivity
 				Log.i(APP, "load outline");
 				Outline[] outline = doc.loadOutline();
 				if (outline != null) {
-					flatOutline = new ArrayList<OutlineActivity.Item>();
+					flatOutline = new ArrayList<ContentFragment.Item>();
 					flattenOutline(outline, "");
 				} else {
 					flatOutline = null;
