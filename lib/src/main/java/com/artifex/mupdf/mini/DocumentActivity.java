@@ -42,7 +42,7 @@ import java.util.Stack;
 
 public class DocumentActivity extends FragmentActivity
 {
-	public static final String APP = "MuPDF";
+	public static final String APP = "Reader";
 
 	public final int NAVIGATE_REQUEST = 1;
 
@@ -59,6 +59,7 @@ public class DocumentActivity extends FragmentActivity
 	private static final String PAGE_COUNT = "PAGE_COUNT";
 	private int oldPageCount;
 
+	private static final String DEFAULT_CHAPTER_NAME = "Section";
 	protected String mimetype;
 	protected SeekableInputStream stream;
 	protected byte[] buffer;
@@ -89,6 +90,8 @@ public class DocumentActivity extends FragmentActivity
 	protected View navigationBar;
 	protected TextView pageLabel;
 	protected SeekBar pageSeekbar;
+	protected TextView chapterLabel;
+	protected TextView chapterPageLabel;
 
 	private CSSManager cssManager;
 	protected int pageCount;
@@ -98,9 +101,6 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean stopSearch;
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
-
-	protected int currentPageScrollX = 0;
-	protected int currentPageScrollY = 0;
 
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
@@ -257,6 +257,9 @@ public class DocumentActivity extends FragmentActivity
 				gotoPage(newProgress);
 			}
 		});
+
+		chapterLabel = findViewById(R.id.chapter_label);
+		chapterPageLabel = findViewById(R.id.chapter_page);
 
 		searchButton = findViewById(R.id.search_button);
 		searchButton.setOnClickListener(new View.OnClickListener() {
@@ -443,6 +446,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				updatePageNumberInfo(currentPage);
 				loadOrUpdatePage(currentPage);
 				loadOutline();
 			}
@@ -545,6 +549,13 @@ public class DocumentActivity extends FragmentActivity
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
 		pageSeekbar.setProgress(currentPage);
+
+		String chapterName = DEFAULT_CHAPTER_NAME;
+		int chapterCurrentPage = 0;
+		int chapterMaxPages = 0;
+
+		chapterLabel.setText(chapterName);
+		chapterPageLabel.setText("- "+(chapterCurrentPage+1)+" / "+chapterMaxPages);
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {
@@ -615,12 +626,6 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	public void setCurrentPageScroll(int scrollX, int scrollY) {
-		this.currentPageScrollX = scrollX;
-		this.currentPageScrollY = scrollY;
-		//readerView.updateCachedPagesScroll(scrollX, scrollY);
-	}
-
 	protected void search(int direction) {
 		hideKeyboard();
 		int startPage;
@@ -655,8 +660,7 @@ public class DocumentActivity extends FragmentActivity
 					}
 					pageCount = doc.countPages();
 					if(oldPageCount!=pageCount) {
-						float readProgress = ((float) currentPage) / oldPageCount;
-						currentPage = Math.round(readProgress*pageCount);
+						currentPage = Math.round(getReadProgress(currentPage, oldPageCount)*pageCount);
 						if(currentPage<0) currentPage = 0;
 						else if (currentPage>=pageCount) currentPage=pageCount-1;
 					}
@@ -696,8 +700,7 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
-					float readProgress = ((float) prevPage) / prevPageCount;
-					currentPage = Math.round(readProgress*pageCount);
+					currentPage = Math.round(getReadProgress(prevPage, prevPageCount)*pageCount);
 					if (currentPage>=pageCount) currentPage=pageCount-1;
 					else if(currentPage<0) currentPage = 0;
 				} catch (Throwable x) {
@@ -785,6 +788,10 @@ public class DocumentActivity extends FragmentActivity
 				showKeyboard();
 			}
 		}
+	}
+
+	private float getReadProgress(int current, int count) {
+		return ((float) current) / (count - 1);
 	}
 
 	/*

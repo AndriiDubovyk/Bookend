@@ -68,7 +68,7 @@
 					android:singleLine="true"
 					android:textSize="14sp"
 					android:ellipsize="none"
-					android:text="- 250/400"
+					android:text="- 250 / 400"
 					/>
 
 			</LinearLayout>

@@ -25,8 +25,6 @@ public class PageView extends View implements
 {
 	protected DocumentActivity actionListener;
 
-
-
 	protected float pageScale, viewScale;
 	protected Bitmap bitmap;
 	protected int bitmapW, bitmapH;
@@ -157,7 +155,7 @@ public class PageView extends View implements
 				if (bitmap != null) {
 					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits);
 					setPageZoom(actionListener.getCommonZoom());
-					setPageScroll(actionListener.currentPageScrollX, actionListener.currentPageScrollY);
+					setPageScroll(actionListener.readerView.currentPageScrollX, actionListener.readerView.currentPageScrollY);
 				} else {
 					setError();
 				}
@@ -279,7 +277,7 @@ public class PageView extends View implements
 		} else  {
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.NONE);
 		}
-		actionListener.setCurrentPageScroll(scrollX, scrollY);
+		actionListener.readerView.setCurrentPageScroll(scrollX, scrollY);
 	}
 
 

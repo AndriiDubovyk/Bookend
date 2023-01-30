@@ -18,8 +18,11 @@ public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
     private DocumentActivity actionListener;
     private float initialXValue;
+
     private SwipeDirection direction;
-    private float zoom = 1f;
+    protected float zoom = 1f;
+    protected int currentPageScrollX = 0;
+    protected int currentPageScrollY = 0;
 
 
     enum SwipeDirection {
@@ -119,6 +122,11 @@ public class ReaderView extends ViewPager {
                 prevPage = position;
             }
         });
+    }
+
+    public void setCurrentPageScroll(int scrollX, int scrollY) {
+        this.currentPageScrollX = scrollX;
+        this.currentPageScrollY = scrollY;
     }
 
     @Override
