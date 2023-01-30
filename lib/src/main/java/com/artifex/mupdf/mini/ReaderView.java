@@ -76,8 +76,16 @@ public class ReaderView extends ViewPager {
             actionListener.onPageViewSizeChanged(w, h);
     }
 
+    public void setLeftPageScroll(int scrollX, int scrollY) {
+        ((PageAdapter)pagerAdapter).setLeftPageScroll(scrollX, scrollY, getCurrentItem());
+    }
+
+    public void setRightPageScroll(int scrollX, int scrollY) {
+        ((PageAdapter)pagerAdapter).setRightPageScroll(scrollX, scrollY,  getCurrentItem());
+    }
+
     public PageFragment getCurrentPageFragment() {
-        return ((PageAdapter)getAdapter()).getCurrentPageFragment();
+        return ((PageAdapter)pagerAdapter).getCurrentPageFragment();
     }
 
     public void updateCachedPages() {
@@ -85,7 +93,7 @@ public class ReaderView extends ViewPager {
     }
 
     public void updateCachedPagesScroll(int scrollX, int scrollY) {
-        ((PageAdapter)getAdapter()).updateCachedPagesScroll(scrollX, scrollY);
+        ((PageAdapter)pagerAdapter).updateCachedPagesScroll(scrollX, scrollY);
     }
 
     public void setActionListener(DocumentActivity da) {
@@ -93,6 +101,7 @@ public class ReaderView extends ViewPager {
     }
 
 
+    private int prevPage = -1;
     private void setup(Context context) {
         this.direction = SwipeDirection.ALL;
         setBackgroundColor(PageView.BACKGROUND_COLOR);
@@ -103,6 +112,11 @@ public class ReaderView extends ViewPager {
 
             public void onPageSelected(int position) {
                 actionListener.updatePageNumberInfo(position);
+                if(zoom>1) {
+                    if(position == prevPage + 1) setAllowedSwipeDirection(SwipeDirection.LEFT);
+                    else if (position == prevPage-1) setAllowedSwipeDirection(SwipeDirection.RIGHT);
+                }
+                prevPage = position;
             }
         });
     }

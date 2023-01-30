@@ -49,6 +49,20 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         }
     }
 
+    public void setLeftPageScroll(int scrollX, int scrollY, int currentPage) {
+        int leftPage = currentPage-1;
+        if(cache.containsKey(leftPage)) {
+            ((PageFragment)cache.get(leftPage)).setPageScroll(scrollX, scrollY);
+        }
+    }
+
+    public void setRightPageScroll(int scrollX, int scrollY, int currentPage) {
+        int rightPage = currentPage+1;
+        if(cache.containsKey(rightPage)) {
+            ((PageFragment)cache.get(rightPage)).setPageScroll(scrollX, scrollY);
+        }
+    }
+
     @Override
     public Fragment getItem(int position) {
         Bundle arguments = new Bundle();

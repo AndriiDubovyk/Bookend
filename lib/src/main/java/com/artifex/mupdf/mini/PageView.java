@@ -50,12 +50,12 @@ public class PageView extends View implements
 	private static final float MIN_SCALE = 1;
 	private static final float MAX_SCALE = 8;
 
-	public static int BACKGROUND_COLOR = 0xFFf2d3aa;
-	private static int INK_COLOR = 0xFF6e5837;
+	public static final int BACKGROUND_COLOR = 0xFFf2d3aa;
+	private static final int INK_COLOR = 0xFF6e5837;
 
-	private static int ERROR_PAINT_COLOR = 0xffff5050;
-	private static int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
-	private static int LINK_PAINT_COLOR = 0x00ffffff;
+	private static final int ERROR_PAINT_COLOR = 0xffff5050;
+	private static final int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
+	private static final int LINK_PAINT_COLOR = 0x00ffffff; // no background color for active links
 
 
 	public PageView(Context ctx, AttributeSet atts) {
@@ -267,10 +267,14 @@ public class PageView extends View implements
 
 	public void controlPaging() {
 		if(viewScale <= 1f) {
+			actionListener.readerView.setLeftPageScroll(bitmapW-canvasW, scrollY);
+			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.RIGHT);
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.ALL);
 		}else if(scrollX<=0) {
+			actionListener.readerView.setLeftPageScroll(bitmapW-canvasW, scrollY);
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.LEFT);
 		} else if (scrollX+canvasW>=bitmapW) {
+			actionListener.readerView.setRightPageScroll(0, scrollY);
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.RIGHT);
 		} else  {
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.NONE);

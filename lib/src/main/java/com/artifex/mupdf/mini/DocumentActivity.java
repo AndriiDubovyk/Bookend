@@ -357,12 +357,12 @@ public class DocumentActivity extends FragmentActivity
 		case KeyEvent.KEYCODE_PAGE_UP:
 		case KeyEvent.KEYCODE_COMMA:
 		case KeyEvent.KEYCODE_B:
-			//goBackward();
+			goBackward();
 			return true;
 		case KeyEvent.KEYCODE_PAGE_DOWN:
 		case KeyEvent.KEYCODE_PERIOD:
 		case KeyEvent.KEYCODE_SPACE:
-			//goForward();
+			goForward();
 			return true;
 		case KeyEvent.KEYCODE_M:
 			history.push(currentPage);
@@ -434,6 +434,8 @@ public class DocumentActivity extends FragmentActivity
 					doc.layout(layoutW, layoutH, LAYOUT_EM);
 					pageCount = doc.countPages();
 					currentPage = doc.pageNumberFromLocation(doc.findBookmark(mark));
+					if(currentPage>pageCount) currentPage = pageCount-1;
+					else if (currentPage<0) currentPage = 0;
 				} catch (Throwable x) {
 					pageCount = 1;
 					currentPage = 0;
@@ -616,7 +618,7 @@ public class DocumentActivity extends FragmentActivity
 	public void setCurrentPageScroll(int scrollX, int scrollY) {
 		this.currentPageScrollX = scrollX;
 		this.currentPageScrollY = scrollY;
-		readerView.updateCachedPagesScroll(scrollX, scrollY);
+		//readerView.updateCachedPagesScroll(scrollX, scrollY);
 	}
 
 	protected void search(int direction) {
@@ -696,8 +698,8 @@ public class DocumentActivity extends FragmentActivity
 					pageCount = doc.countPages();
 					float readProgress = ((float) prevPage) / prevPageCount;
 					currentPage = Math.round(readProgress*pageCount);
-					if(currentPage<0) currentPage = 0;
-					else if (currentPage>=pageCount) currentPage=pageCount-1;
+					if (currentPage>=pageCount) currentPage=pageCount-1;
+					else if(currentPage<0) currentPage = 0;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
