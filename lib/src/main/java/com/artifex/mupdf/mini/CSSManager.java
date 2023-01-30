@@ -7,7 +7,7 @@ public class CSSManager {
 
     public String font = "Merriweather";
     public int fontSize = 10; // range 1-40
-    public String textAlign = "left";
+    public String textAlign = "justify";
 
     private final float MIN_REAL_FONT_SIZE_EM = 5.0f;
     private final String TABLE_FIX = "td {text-align: center !important;} td p{display: inherit !important;}";
@@ -20,8 +20,8 @@ public class CSSManager {
         builder
                 .append("body {font-size: ")
                 .append(realFontSize).append("em !important; font-family: ")
-                .append(FONTS.get(font)).append(" !important;} p:not(.center){text-align: ")
-                .append(textAlign).append(" !important;}")
+                .append(FONTS.get(font)).append(" !important;} p{text-align: ")
+                .append(textAlign).append(" !important;} p.center{text-align: center !important;}")
                 .append(TABLE_FIX);
         return builder.toString();
     }
