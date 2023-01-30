@@ -1,22 +1,22 @@
 package com.artifex.mupdf.mini;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ContentFragment extends ListFragment {
 
@@ -56,7 +56,7 @@ public class ContentFragment extends ListFragment {
                 found = i;
             items.add(item);
         }
-        adapter = new ArrayAdapter<Item>(getActivity(), android.R.layout.simple_list_item_1, items);
+        adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, items);
         setListAdapter(adapter);
 
     }
@@ -64,9 +64,6 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
         try {
             actionListener = (DocumentActivity) activity;
         } catch (Exception e) {
@@ -80,5 +77,30 @@ public class ContentFragment extends ListFragment {
         Item item = (Item) (adapter.getItem(position));
         actionListener.gotoPage(item.page);
         actionListener.closeContentFragment();
+    }
+
+    public class ContentListAdapter extends ArrayAdapter<Item> {
+        private final Context context;
+        private final ArrayList<Item> items;
+
+        public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<Item> objects) {
+            super(context, resource, objects);
+            this.items = new ArrayList<>(objects);
+            this.context = context;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View itemView = inflater.inflate(R.layout.content_item, parent, false);
+            Item item = items.get(position);
+            TextView titleTextView = itemView.findViewById(R.id.contentTitle);
+            titleTextView.setText(item.title);
+            TextView pageTextView = itemView.findViewById(R.id.page_number);
+            pageTextView.setText(""+item.page);
+            return itemView;
+        }
+
+
     }
 }

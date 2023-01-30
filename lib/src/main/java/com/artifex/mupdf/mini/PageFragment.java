@@ -37,6 +37,8 @@ public class PageFragment extends Fragment {
         return rootView;
     }
 
+
+
     public void setPage(int pageNumber) {
         this.pageNumber = pageNumber;
         pageView.setActionListener(actionListener);
