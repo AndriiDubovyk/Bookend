@@ -104,7 +104,7 @@ public class DocumentActivity extends FragmentActivity
 	protected Stack<Integer> history;
 	private DocumentActivity actionListener;
 
-	protected ContentFragment contentFragment;
+	protected ContentFragment contentFragment = new ContentFragment();
 
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
@@ -314,10 +314,10 @@ public class DocumentActivity extends FragmentActivity
 		outlineButton = findViewById(R.id.outline_button);
 		outlineButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if(contentFragment==null) {
-					createContentFragment();
-				} else {
+				if(contentFragment.isVisible()) {
 					closeContentFragment();
+				} else {
+					createContentFragment();
 				}
 			}
 		});
@@ -359,12 +359,11 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	private void createContentFragment() {
-		contentFragment = new ContentFragment();
 		Bundle bundle = new Bundle();
 		bundle.putInt("POSITION", currentPage);
 		bundle.putSerializable("OUTLINE", flatOutline);
 		contentFragment.setArguments(bundle);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);;
 		ft.setReorderingAllowed(true);
 		ft.replace(R.id.side_menu_container, contentFragment);
 		ft.commit();
@@ -547,9 +546,8 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onBackPressed() {
-		if(contentFragment!=null) {
-			getSupportFragmentManager().beginTransaction().remove(contentFragment).commit();
-			contentFragment = null;
+		if(!contentFragment.isVisible()) {
+			closeContentFragment();
 		}else if (history.empty()) {
 			super.onBackPressed();
 			if (returnToLibraryActivity) {
@@ -563,8 +561,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void closeContentFragment() {
-		getSupportFragmentManager().beginTransaction().remove(contentFragment).commit();
-		contentFragment = null;
+		getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).remove(contentFragment).commit();
 	}
 
 	public void updatePageNumberInfo(int newPageNumber) {

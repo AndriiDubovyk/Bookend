@@ -204,7 +204,7 @@ public class PageView extends View implements
 
 	@RequiresApi(api = Build.VERSION_CODES.N)
 	public boolean onSingleTapUp(MotionEvent e) {
-		if(actionListener.contentFragment!=null) actionListener.closeContentFragment();
+		if(actionListener.contentFragment.isVisible()) actionListener.closeContentFragment();
 		boolean foundLink = false;
 		float x = e.getX();
 		float y = e.getY();
