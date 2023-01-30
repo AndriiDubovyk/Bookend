@@ -550,12 +550,12 @@ public class DocumentActivity extends FragmentActivity
 		pageSeekbar.setMax(pageCount - 1);
 		pageSeekbar.setProgress(currentPage);
 
-		String chapterName = DEFAULT_CHAPTER_NAME;
-		int chapterCurrentPage = 0;
-		int chapterMaxPages = 0;
-
-		chapterLabel.setText(chapterName);
-		chapterPageLabel.setText("- "+(chapterCurrentPage+1)+" / "+chapterMaxPages);
+//		String chapterName = DEFAULT_CHAPTER_NAME;
+//		int chapterCurrentPage = 0;
+//		int chapterMaxPages = 0;
+//
+//		chapterLabel.setText(chapterName);
+//		chapterPageLabel.setText("- "+(chapterCurrentPage+1)+" / "+chapterMaxPages);
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {
