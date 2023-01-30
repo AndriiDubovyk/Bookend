@@ -28,9 +28,6 @@
                 <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".OutlineActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"></activity>
     </application>
 
 </manifest>

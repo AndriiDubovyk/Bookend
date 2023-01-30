@@ -314,23 +314,8 @@ public class DocumentActivity extends FragmentActivity
 		outlineButton = findViewById(R.id.outline_button);
 		outlineButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-//				Intent intent = new Intent(DocumentActivity.this, OutlineActivity.class);
-//				Bundle bundle = new Bundle();
-//				bundle.putInt("POSITION", currentPage);
-//				bundle.putSerializable("OUTLINE", flatOutline);
-//				intent.putExtras(bundle);
-//				startActivityForResult(intent, NAVIGATE_REQUEST);
-				// Create new fragment and transaction
 				if(contentFragment==null) {
-					contentFragment = new ContentFragment();
-					Bundle bundle = new Bundle();
-					bundle.putInt("POSITION", currentPage);
-					bundle.putSerializable("OUTLINE", flatOutline);
-					contentFragment.setArguments(bundle);
-					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-					ft.setReorderingAllowed(true);
-					ft.replace(R.id.side_menu_container, contentFragment);
-					ft.commit();
+					createContentFragment();
 				} else {
 					closeContentFragment();
 				}
@@ -371,6 +356,18 @@ public class DocumentActivity extends FragmentActivity
 		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
 		currentPage = prefs.getInt(key+CURRENT_PAGE, 0);
 		oldPageCount = prefs.getInt(key+PAGE_COUNT, 0);
+	}
+
+	private void createContentFragment() {
+		contentFragment = new ContentFragment();
+		Bundle bundle = new Bundle();
+		bundle.putInt("POSITION", currentPage);
+		bundle.putSerializable("OUTLINE", flatOutline);
+		contentFragment.setArguments(bundle);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.setReorderingAllowed(true);
+		ft.replace(R.id.side_menu_container, contentFragment);
+		ft.commit();
 	}
 
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
