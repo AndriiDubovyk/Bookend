@@ -26,6 +26,7 @@ public class OutlineActivity extends ListActivity
 		}
 	}
 
+
 	protected ArrayAdapter<Item> adapter;
 
 	public void onCreate(Bundle savedInstanceState) {

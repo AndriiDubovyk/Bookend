@@ -4,11 +4,27 @@
 	android:layout_height="match_parent"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:keepScreenOn="true">
+
+
 	<com.artifex.mupdf.mini.ReaderView
 		android:id="@+id/reader_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:keepScreenOn="true" />
+
+
+
+
+	<androidx.fragment.app.FragmentContainerView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/side_menu_container"
+		android:layout_width="270dp"
+		android:layout_height="600dp"
+		android:layout_alignParentRight="true"
+		android:layout_centerVertical="true"
+		/>
+
+
 
 	<LinearLayout android:id="@+id/action_bar"
 			android:layout_width="match_parent"
