@@ -50,6 +50,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setLeftPageScroll(int scrollX, int scrollY, int currentPage) {
+        Log.i("mytag", "set left "+scrollX+" "+scrollY);
         int leftPage = currentPage-1;
         if(cache.containsKey(leftPage)) {
             ((PageFragment)cache.get(leftPage)).setPageScroll(scrollX, scrollY);

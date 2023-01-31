@@ -1,6 +1,7 @@
 package com.artifex.mupdf.mini;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class PageFragment extends Fragment {
     }
 
     public void setPageScroll(int scrollX, int scrollY) {
+        Log.i("mytag", "setPageScroll1");
         pageView.setPageScroll(scrollX, scrollY);
     }
 }

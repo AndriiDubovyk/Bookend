@@ -9,7 +9,6 @@
             android:name=".DocumentActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden"
             android:exported="true"
-            android:hardwareAccelerated="false"
             android:label="MuPDF mini">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

@@ -101,7 +101,7 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs) {
+	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs, boolean invalidate) {
 		if (bitmap != null)
 			bitmap.recycle();
 		error = false;
@@ -111,7 +111,11 @@ public class PageView extends View implements
 		bitmapW = (int)(bitmap.getWidth() * viewScale / zoom);
 		bitmapH = (int)(bitmap.getHeight() * viewScale / zoom);
 		scroller.forceFinished(true);
-		invalidate();
+		if(invalidate) invalidate();
+	}
+
+	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs) {
+		setBitmap(b, zoom, ls, hs, true);
 	}
 
 	private boolean isActivePage() {
@@ -153,9 +157,10 @@ public class PageView extends View implements
 			}
 			public void run() {
 				if (bitmap != null) {
-					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits);
-					setPageZoom(actionListener.getCommonZoom());
-					setPageScroll(actionListener.readerView.currentPageScrollX, actionListener.readerView.currentPageScrollY);
+					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits, false);
+					setPageZoom(actionListener.getCommonZoom(), false);
+					setPageScroll(actionListener.readerView.currentPageScrollX, actionListener.readerView.currentPageScrollY, false);
+					invalidate();
 				} else {
 					setError();
 				}
@@ -259,15 +264,21 @@ public class PageView extends View implements
 		return true;
 	}
 
-	public void setPageScroll(int scrollX, int scrollY) {
+	public void setPageScroll(int scrollX, int scrollY, boolean invalidate) {
 		this.scrollX = scrollX;
 		this.scrollY = scrollY;
+		if(invalidate) invalidate();
 	}
+
+	public void setPageScroll(int scrollX, int scrollY) {
+		setPageScroll(scrollX, scrollY, true);
+	}
+
 
 	public void controlPaging() {
 		if(viewScale <= 1f) {
 			actionListener.readerView.setLeftPageScroll(bitmapW-canvasW, scrollY);
-			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.RIGHT);
+			actionListener.readerView.setRightPageScroll(0, scrollY);
 			actionListener.readerView.setAllowedSwipeDirection(ReaderView.SwipeDirection.ALL);
 		}else if(scrollX<=0) {
 			actionListener.readerView.setLeftPageScroll(bitmapW-canvasW, scrollY);
@@ -298,7 +309,7 @@ public class PageView extends View implements
 		return true;
 	}
 
-	private void setPageZoomProcces(float scale) {
+	public void setPageZoom(float scale, boolean invalidate) {
 		if(viewScale==scale) return;
 		float pageFocusX = (scaleDetector.getFocusX()+ scrollX) / viewScale;
 		float pageFocusY = (scaleDetector.getFocusY() + scrollY) / viewScale;
@@ -308,19 +319,11 @@ public class PageView extends View implements
 		scrollX = (int)(pageFocusX * viewScale - scaleDetector.getFocusX());
 		scrollY = (int)(pageFocusY * viewScale - scaleDetector.getFocusY());
 		scroller.forceFinished(true);
+		if(invalidate) invalidate();
 	}
 
 	public void setPageZoom(float scale) {
-		if(isActivePage()) { setPageZoomProcces(scale);}
-		else {
-			actionListener.getWorker().add(new Worker.Task() {
-				public void work() {
-					try { setPageZoomProcces(scale);}
-					catch (Throwable x) {Log.i(DocumentActivity.APP, x.getMessage());}
-				}
-				public void run() {}
-			});
-		}
+		setPageZoom(scale, true);
 	}
 
 
