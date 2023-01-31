@@ -606,8 +606,10 @@ public class DocumentActivity extends FragmentActivity
 	protected void resetSearch() {
 		stopSearch = true;
 		searchHitPage = -1;
-		searchNeedle = null;
-		readerView.updateCachedPages();
+		if(searchNeedle!=null) {
+			searchNeedle = null;
+			readerView.updateCachedPages();
+		}
 	}
 
 	protected void runSearch(final int startPage, final int direction, final String needle) {
@@ -841,7 +843,6 @@ public class DocumentActivity extends FragmentActivity
 	private void loadOrUpdatePage(int p) {
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
-		currentPage = p;
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			currentPage = p;
 			readerView.setCurrentItem(p, false);

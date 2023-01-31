@@ -44,7 +44,6 @@ public class PageFragment extends Fragment {
     }
 
     public void updatePage() {
-        Log.i("mytag", "updatePage "+pageNumber);
         pageView.setPage(pageNumber);
     }
 
