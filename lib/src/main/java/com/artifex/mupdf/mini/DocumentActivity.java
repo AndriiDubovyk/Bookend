@@ -2,6 +2,7 @@ package com.artifex.mupdf.mini;
 
 import com.artifex.mupdf.fitz.*;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.IOException;
@@ -51,6 +53,15 @@ public class DocumentActivity extends FragmentActivity
 	protected SharedPreferences prefs;
 
 	protected Document doc;
+
+	protected FragmentsState currentFragmentState = FragmentsState.NONE;
+
+	enum FragmentsState {
+		NONE,
+		CONTENT
+	}
+
+	private static final String FRAGMENT_CONTENT_TAG = "FRAGMENT_CONTENT_TAG";
 
 	// We must keep all this info for cases with screen size change
 	protected String key;
@@ -313,10 +324,10 @@ public class DocumentActivity extends FragmentActivity
 		outlineButton = findViewById(R.id.outline_button);
 		outlineButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				if(contentFragment.isVisible()) {
-					closeContentFragment();
+				if(currentFragmentState == FragmentsState.CONTENT) {
+					manageFragmentTransaction(FragmentsState.NONE);
 				} else {
-					createContentFragment();
+					manageFragmentTransaction(FragmentsState.CONTENT);
 				}
 			}
 		});
@@ -358,15 +369,32 @@ public class DocumentActivity extends FragmentActivity
 		oldChapterPageCount = prefs.getInt(key+CHAPTER_PAGE_COUNT, 0);
 	}
 
-	private void createContentFragment() {
-		Bundle bundle = new Bundle();
-		bundle.putInt("POSITION", currentPage);
-		bundle.putSerializable("OUTLINE", flatOutline);
-		contentFragment.setArguments(bundle);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);;
-		ft.setReorderingAllowed(true);
-		ft.replace(R.id.side_menu_container, contentFragment);
-		ft.commit();
+	@SuppressLint("ResourceType")
+	public void manageFragmentTransaction(FragmentsState fs) {
+		FragmentManager fm = getSupportFragmentManager();
+		switch (fs) {
+			case CONTENT:
+				if(currentFragmentState == FragmentsState.CONTENT) return;
+				currentFragmentState = FragmentsState.CONTENT;
+				Bundle bundle = new Bundle();
+				bundle.putInt("POSITION", currentPage);
+				bundle.putSerializable("OUTLINE", flatOutline);
+				contentFragment.setArguments(bundle);
+				if(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
+				} else {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();
+				}
+				// hide other fragments
+				break;
+			case NONE:
+				if(currentFragmentState == FragmentsState.NONE) return;
+				currentFragmentState = FragmentsState.NONE;
+				if (fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).hide(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
+				}
+				break;
+		}
 	}
 
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -464,6 +492,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
 				updatePageNumberInfo(currentPage);
 				loadOrUpdatePage(currentPage);
 				loadOutline();
@@ -553,8 +582,8 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onBackPressed() {
-		if(contentFragment.isVisible()) {
-			closeContentFragment();
+		if(currentFragmentState!=FragmentsState.NONE) {
+			manageFragmentTransaction(FragmentsState.NONE);
 		}else if (history.empty()) {
 			super.onBackPressed();
 			if (returnToLibraryActivity) {
@@ -565,10 +594,6 @@ public class DocumentActivity extends FragmentActivity
 			currentPage = history.pop();
 			loadOrUpdatePage(currentPage);
 		}
-	}
-
-	public void closeContentFragment() {
-		getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).remove(contentFragment).commit();
 	}
 
 	public void updatePageNumberInfo(int newPageNumber) {
@@ -746,6 +771,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
 				readerView.getAdapter().notifyDataSetChanged();
 				if (currentPage < 0 || currentPage >= pageCount)
 					currentPage = 0;
@@ -818,8 +844,8 @@ public class DocumentActivity extends FragmentActivity
 
 	public void toggleUI() {
 		if (navigationBar.getVisibility() == View.VISIBLE) {
-			currentBar.setVisibility(View.GONE);
-			navigationBar.setVisibility(View.GONE);
+			currentBar.setVisibility(View.INVISIBLE);
+			navigationBar.setVisibility(View.INVISIBLE);
 			if (currentBar == searchBar)
 				hideKeyboard();
 		} else {

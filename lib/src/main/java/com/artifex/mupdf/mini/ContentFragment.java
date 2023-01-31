@@ -3,6 +3,7 @@ package com.artifex.mupdf.mini;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,7 @@ public class ContentFragment extends ListFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("mytag", "contetn on create");
         ArrayList<Item> items = new ArrayList<>();
         Bundle bundle = getArguments();
         int currentPage = bundle.getInt("POSITION");
@@ -76,7 +78,7 @@ public class ContentFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         Item item = (Item) (adapter.getItem(position));
         actionListener.gotoPage(item.page);
-        actionListener.closeContentFragment();
+        actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
     }
 
     public class ContentListAdapter extends ArrayAdapter<Item> {
