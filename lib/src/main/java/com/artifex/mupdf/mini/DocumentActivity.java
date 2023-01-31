@@ -21,7 +21,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -58,8 +57,11 @@ public class DocumentActivity extends FragmentActivity
 	// We must keep all this info for cases with screen size change
 	protected String key;
 	private static final String CURRENT_PAGE = "CURRENT_PAGE";
-	private static final String PAGE_COUNT = "PAGE_COUNT";
-	private int oldPageCount;
+	private static final String CURRENT_CHAPTER_PAGE = "CURRENT_CHAPTER_PAGE";
+	private static final String CURRENT_CHAPTER = "CURRENT_CHAPTER";
+	private static final String CHAPTER_PAGE_COUNT = "CHAPTER_PAGE_COUNT";
+	private int oldChapterPageCount;
+	private Location loadedLoc;
 
 	private static final String DEFAULT_CHAPTER_NAME = "Section";
 	protected String mimetype;
@@ -354,8 +356,9 @@ public class DocumentActivity extends FragmentActivity
 	private void loadPrefs() {
 		prefs = getPreferences(Context.MODE_PRIVATE);
 		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
+		loadedLoc = new Location(prefs.getInt(key+ CURRENT_CHAPTER, 0), prefs.getInt(key+CURRENT_CHAPTER_PAGE, 0));
 		currentPage = prefs.getInt(key+CURRENT_PAGE, 0);
-		oldPageCount = prefs.getInt(key+PAGE_COUNT, 0);
+		oldChapterPageCount = prefs.getInt(key+CHAPTER_PAGE_COUNT, 0);
 	}
 
 	private void createContentFragment() {
@@ -446,13 +449,17 @@ public class DocumentActivity extends FragmentActivity
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
-					long mark = doc.makeBookmark(doc.locationFromPageNumber(currentPage));
+					loadedLoc = doc.locationFromPageNumber(currentPage);
+					int oldChapterPages = doc.countPages(loadedLoc.chapter);
 					Log.i(APP, "relayout document");
 					doc.layout(layoutW, layoutH, LAYOUT_EM);
 					pageCount = doc.countPages();
-					currentPage = doc.pageNumberFromLocation(doc.findBookmark(mark));
-					if(currentPage>pageCount) currentPage = pageCount-1;
-					else if (currentPage<0) currentPage = 0;
+					if(oldChapterPages!=doc.countPages(loadedLoc.chapter)) {
+						Location newLoc = getNewLocation(loadedLoc, oldChapterPages);
+						currentPage = doc.pageNumberFromLocation(newLoc);
+						if(currentPage<0) currentPage = 0;
+						else if (currentPage>=pageCount) currentPage=pageCount-1;
+					}
 				} catch (Throwable x) {
 					pageCount = 1;
 					currentPage = 0;
@@ -472,8 +479,8 @@ public class DocumentActivity extends FragmentActivity
 	 */
 	protected void reopenDocument() {
 		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
-		int prevPage = currentPage;
-		int prevPageCount = pageCount;
+		Location oldLoc = doc.locationFromPageNumber(currentPage);
+		int oldChapterPages = doc.countPages(oldLoc.chapter);
 		worker.add(new Worker.Task() {
 			boolean needsPassword;
 			public void work() {
@@ -484,7 +491,7 @@ public class DocumentActivity extends FragmentActivity
 					doc = Document.openDocument(stream, mimetype);;
 			}
 			public void run() {
-				reloadDocument(prevPage, prevPageCount);
+				reloadDocument(oldLoc, oldChapterPages);
 			}
 		});
 	}
@@ -541,7 +548,10 @@ public class DocumentActivity extends FragmentActivity
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt("fontSize", cssManager.fontSize);
 		editor.putInt(key+CURRENT_PAGE, currentPage);
-		editor.putInt(key+PAGE_COUNT, pageCount);
+		loadedLoc = doc.locationFromPageNumber(currentPage);
+		editor.putInt(key+ CURRENT_CHAPTER, loadedLoc.chapter);
+		editor.putInt(key+CURRENT_CHAPTER_PAGE, loadedLoc.page);
+		editor.putInt(key+CHAPTER_PAGE_COUNT, doc.countPages(loadedLoc.chapter));
 		editor.apply();
 	}
 
@@ -679,8 +689,9 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
-					if(oldPageCount!=pageCount) {
-						currentPage = Math.round(getReadProgress(currentPage, oldPageCount)*pageCount);
+					if(oldChapterPageCount!=doc.countPages(loadedLoc.chapter)) {
+						Location newLoc = getNewLocation(loadedLoc, oldChapterPageCount);
+						currentPage = doc.pageNumberFromLocation(newLoc);
 						if(currentPage<0) currentPage = 0;
 						else if (currentPage>=pageCount) currentPage=pageCount-1;
 					}
@@ -706,7 +717,7 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	protected void reloadDocument(int prevPage, int prevPageCount) {
+	protected void reloadDocument(Location oldLoc, int oldChapterPages) {
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
@@ -720,9 +731,12 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
-					currentPage = Math.round(getReadProgress(prevPage, prevPageCount)*pageCount);
-					if (currentPage>=pageCount) currentPage=pageCount-1;
-					else if(currentPage<0) currentPage = 0;
+					if(oldChapterPages!=doc.countPages(oldLoc.chapter)) {
+						Location newLoc = getNewLocation(oldLoc, oldChapterPages);
+						currentPage = doc.pageNumberFromLocation(newLoc);
+						if(currentPage<0) currentPage = 0;
+						else if (currentPage>=pageCount) currentPage=pageCount-1;
+					}
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -775,6 +789,13 @@ public class DocumentActivity extends FragmentActivity
 					outlineButton.setVisibility(View.VISIBLE);
 			}
 		});
+	}
+
+	private Location getNewLocation(Location loc, int oldChapterPageCount) {
+		int currentChapterPages = doc.countPages(loc.chapter);
+		int newPage = Math.round(getReadProgress(loc.page, oldChapterPageCount)*currentChapterPages);
+		if(newPage>=currentChapterPages) newPage = currentChapterPages-1;
+		return new Location(loc.chapter, newPage);
 	}
 
 	protected void showSearch() {
