@@ -20,7 +20,7 @@ public class ReaderView extends ViewPager {
     private float initialXValue;
 
     private SwipeDirection direction;
-    protected float zoom = 1f;
+    private float zoom = 1f;
     protected int currentPageScrollX = 0;
     protected int currentPageScrollY = 0;
 

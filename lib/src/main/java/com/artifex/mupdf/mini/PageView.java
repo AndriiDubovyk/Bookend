@@ -25,7 +25,7 @@ public class PageView extends View implements
 {
 	protected DocumentActivity actionListener;
 
-	protected float pageScale, viewScale;
+	protected float viewScale;
 	protected Bitmap bitmap;
 	protected int bitmapW, bitmapH;
 	protected int canvasW, canvasH;
@@ -52,7 +52,7 @@ public class PageView extends View implements
 	private static final int INK_COLOR = 0xFF6e5837;
 
 	private static final int ERROR_PAINT_COLOR = 0xffff5050;
-	private static final int SEARCH_HIT_PAINT_COLOR = 0x20ff0000;
+	private static final int SEARCH_HIT_PAINT_COLOR = 0x30ff0000;
 	private static final int LINK_PAINT_COLOR = 0x00ffffff; // no background color for active links
 
 
@@ -63,7 +63,6 @@ public class PageView extends View implements
 		detector = new GestureDetector(ctx, this);
 		scaleDetector = new ScaleGestureDetector(ctx, this);
 
-		pageScale = 1;
 		viewScale = 1;
 
 		linkPaint = new Paint();
@@ -101,21 +100,21 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs, boolean invalidate) {
+	private void setBitmap(Bitmap b, Link[] ls, Quad[][] hs, boolean invalidate) {
 		if (bitmap != null)
 			bitmap.recycle();
 		error = false;
 		links = ls;
 		hits = hs;
 		bitmap = b;
-		bitmapW = (int)(bitmap.getWidth() * viewScale / zoom);
-		bitmapH = (int)(bitmap.getHeight() * viewScale / zoom);
+		bitmapW = (int)(bitmap.getWidth() * viewScale);
+		bitmapH = (int)(bitmap.getHeight() * viewScale);
 		scroller.forceFinished(true);
 		if(invalidate) invalidate();
 	}
 
-	private void setBitmap(Bitmap b, float zoom, Link[] ls, Quad[][] hs) {
-		setBitmap(b, zoom, ls, hs, true);
+	private void setBitmap(Bitmap b, Link[] ls, Quad[][] hs) {
+		setBitmap(b, ls, hs, true);
 	}
 
 	private boolean isActivePage() {
@@ -132,7 +131,7 @@ public class PageView extends View implements
 			public void work() {
 				try {
 					Log.i(DocumentActivity.APP, "load page " + pageNumber);
-					Page page = DocumentActivity.doc.loadPage(pageNumber);
+					Page page = actionListener.doc.loadPage(pageNumber);
 					Log.i(DocumentActivity.APP, "draw page " + pageNumber + " zoom=" + actionListener.getCommonZoom());
 					Matrix ctm;
 					ctm = AndroidDrawDevice.fitPageWidth(page, actionListener.getCanvasW());
@@ -157,7 +156,7 @@ public class PageView extends View implements
 			}
 			public void run() {
 				if (bitmap != null) {
-					setBitmap(bitmap, actionListener.getCommonZoom(), links, hits, false);
+					setBitmap(bitmap, links, hits, false);
 					setPageZoom(actionListener.getCommonZoom(), false);
 					setPageScroll(actionListener.readerView.currentPageScrollX, actionListener.readerView.currentPageScrollY, false);
 					invalidate();
@@ -314,8 +313,8 @@ public class PageView extends View implements
 		float pageFocusX = (scaleDetector.getFocusX()+ scrollX) / viewScale;
 		float pageFocusY = (scaleDetector.getFocusY() + scrollY) / viewScale;
 		viewScale = scale;
-		bitmapW = (int)(bitmap.getWidth() * viewScale / pageScale);
-		bitmapH = (int)(bitmap.getHeight() * viewScale / pageScale);
+		bitmapW = (int)(bitmap.getWidth() * viewScale);
+		bitmapH = (int)(bitmap.getHeight() * viewScale);
 		scrollX = (int)(pageFocusX * viewScale - scaleDetector.getFocusX());
 		scrollY = (int)(pageFocusY * viewScale - scaleDetector.getFocusY());
 		scroller.forceFinished(true);

@@ -50,9 +50,7 @@ public class DocumentActivity extends FragmentActivity
 	protected Worker worker;
 	protected SharedPreferences prefs;
 
-	public static Document doc;
-
-	private Context mContext;
+	protected Document doc;
 
 	// We must keep all this info for cases with screen size change
 	protected String key;
@@ -155,7 +153,6 @@ public class DocumentActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		mContext = this;
 		actionListener = this;
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -556,7 +553,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void onBackPressed() {
-		if(!contentFragment.isVisible()) {
+		if(contentFragment.isVisible()) {
 			closeContentFragment();
 		}else if (history.empty()) {
 			super.onBackPressed();
@@ -638,6 +635,7 @@ public class DocumentActivity extends FragmentActivity
 				if (stopSearch || needle != searchNeedle) {
 					pageLabel.setText((currentPage+1) + " / " + pageCount);
 				} else if (searchHitPage == currentPage) {
+					readerView.updateCachedPages();
 					loadOrUpdatePage(currentPage);
 				} else if (searchHitPage >= 0) {
 					history.push(currentPage);
@@ -657,6 +655,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	protected void search(int direction) {
+		readerView.setZoom(1);
 		hideKeyboard();
 		int startPage;
 		if (searchHitPage == currentPage)
@@ -778,7 +777,7 @@ public class DocumentActivity extends FragmentActivity
 				Log.i(APP, "load outline");
 				Outline[] outline = doc.loadOutline();
 				if (outline != null) {
-					flatOutline = new ArrayList<ContentFragment.Item>();
+					flatOutline = new ArrayList<>();
 					flattenOutline(outline, "");
 				} else {
 					flatOutline = null;
@@ -826,7 +825,7 @@ public class DocumentActivity extends FragmentActivity
 			navigationBar.setVisibility(View.VISIBLE);
 			if (currentBar == searchBar) {
 				searchBar.requestFocus();
-				showKeyboard();
+				if(searchText.getText().equals("")) showKeyboard();
 			}
 		}
 	}
@@ -843,7 +842,7 @@ public class DocumentActivity extends FragmentActivity
 		if(Math.abs(currentPage-p)<2)
 			readerView.getCurrentPageFragment().updatePage();
 		currentPage = p;
-		if (p >= 0 && p < pageCount) {
+		if (p >= 0 && p < pageCount && p != currentPage) {
 			currentPage = p;
 			readerView.setCurrentItem(p, false);
 		}

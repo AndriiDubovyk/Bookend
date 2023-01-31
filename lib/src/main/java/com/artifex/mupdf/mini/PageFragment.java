@@ -39,11 +39,12 @@ public class PageFragment extends Fragment {
 
     public void setPage(int pageNumber) {
         this.pageNumber = pageNumber;
-        pageView.setActionListener(actionListener);
+        if(pageView.actionListener==null) pageView.setActionListener(actionListener);
         pageView.setPage(pageNumber);
     }
 
     public void updatePage() {
+        Log.i("mytag", "updatePage "+pageNumber);
         pageView.setPage(pageNumber);
     }
 
@@ -52,7 +53,6 @@ public class PageFragment extends Fragment {
     }
 
     public void setPageScroll(int scrollX, int scrollY) {
-        Log.i("mytag", "setPageScroll1");
         pageView.setPageScroll(scrollX, scrollY);
     }
 }
