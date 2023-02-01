@@ -80,7 +80,6 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean hasLoaded;
 	protected boolean isReflowable;
 	protected String title;
-	protected ArrayList<ContentFragment.DisplayedItem> flatOutline;
 	protected float layoutW, layoutH;
 	protected static final float LAYOUT_EM = 1;
 	protected float displayDPI;
@@ -376,12 +375,9 @@ public class DocumentActivity extends FragmentActivity
 				if(currentFragmentState == FragmentsState.CONTENT) return;
 				currentFragmentState = FragmentsState.CONTENT;
 				if(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
+					contentFragment.updateItems();
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
 				} else {
-					Bundle bundle = new Bundle();
-					bundle.putInt("POSITION", currentPage);
-					bundle.putSerializable("OUTLINE", flatOutline);
-					contentFragment.setArguments(bundle);
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();
 				}
 				// hide other fragments
@@ -796,14 +792,13 @@ public class DocumentActivity extends FragmentActivity
 				Log.i(APP, "load outline");
 				Outline[] outline = doc.loadOutline();
 				if (outline != null) {
-					flatOutline = new ArrayList<>();
 					contentItems = getContentFromOutline(outline, 0);
 				} else {
-					flatOutline = null;
+					contentItems = null;
 				}
 			}
 			public void run() {
-				if (flatOutline != null)
+				if (contentItems != null)
 					outlineButton.setVisibility(View.VISIBLE);
 			}
 		});

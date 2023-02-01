@@ -7,9 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,7 +28,7 @@ public class ContentFragment extends ListFragment {
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
     private ArrayList<ContentItem> contentItems;
-    private ArrayList<DisplayedItem> displayedItems;
+    private ArrayList<ContentItem> displayedItems;
 
     public static class ContentItem  {
         public String title;
@@ -33,6 +36,7 @@ public class ContentFragment extends ListFragment {
         public int page;
         public int level;
         public ArrayList<ContentItem> down;
+        public boolean isExpanded = false;
         public ContentItem(String title, String uri, int page, int level, ArrayList<ContentItem> down) {
             this.title = title;
             this.uri = uri;
@@ -50,35 +54,6 @@ public class ContentFragment extends ListFragment {
             return title + "{ "+res +" }";
         }
     }
-
-    public static class DisplayedItem {
-        public String title;
-        public String uri;
-        public int page;
-        public int level;
-        public ContentItem ci;
-        public boolean isExpanded = false;
-
-        public DisplayedItem(String title, String uri, int page, int level) {
-            this.title = ci.title;
-            this.uri = ci.uri;
-            this.page = ci.page;
-            this.level = ci.level;
-        }
-
-        public DisplayedItem(ContentItem ci) {
-            this.title = ci.title;
-            this.uri = ci.uri;
-            this.page = ci.page;
-            this.level = ci.level;
-            this.ci = ci;
-        }
-
-
-        public String toString() {
-            return title;
-        }
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,16 +62,18 @@ public class ContentFragment extends ListFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         contentItems = actionListener.getContentItems();
-
         displayedItems = new ArrayList<>();
-        for(ContentItem ci: contentItems) {
-            displayedItems.add(new DisplayedItem(ci));
-        }
+        displayedItems.addAll(contentItems);
         adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
+    }
 
+    public void updateItems() {
+        contentItems = actionListener.getContentItems();
+        displayedItems.clear();
+        displayedItems.addAll(contentItems);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -112,43 +89,40 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        DisplayedItem di = displayedItems.get(position);
-        if(di.isExpanded) collapseItem(position);
-        else expandItem(position);
-        adapter.notifyDataSetChanged();
+        ContentItem ci = (ContentItem) (adapter.getItem(position));
+        actionListener.gotoPage(ci.page);
+        actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
     }
 
     private void expandItem(int position) {
-        DisplayedItem di = displayedItems.get(position);
-        ContentItem ci = di.ci;
+        ContentItem di = displayedItems.get(position);
         if(!di.isExpanded) {
             di.isExpanded = true;
-            for(int i = 0; i<ci.down.size(); i++) {
-                displayedItems.add(position+1+i, new DisplayedItem(ci.down.get(i)));
+            for(int i = 0; i<di.down.size(); i++) {
+                displayedItems.add(position+1+i, di.down.get(i));
             }
         }
     }
 
     private void collapseItem(int position) {
-        DisplayedItem di = displayedItems.get(position);
-        ContentItem ci = di.ci;
+        ContentItem di = displayedItems.get(position);
         if(di.isExpanded) {
             di.isExpanded = false;
-            for(int i = 0; i<ci.down.size(); i++) {
-                DisplayedItem innerDi = displayedItems.get(position+1);
+            for(int i = 0; i<di.down.size(); i++) {
+                ContentItem innerDi = displayedItems.get(position+1);
                 collapseItem(position+1);
                 displayedItems.remove(innerDi);
             }
         }
     }
 
-    public class ContentListAdapter extends ArrayAdapter<DisplayedItem> {
+    private class ContentListAdapter extends ArrayAdapter<ContentItem> {
         private final Context context;
-        private final ArrayList<DisplayedItem> items;
+        private final ArrayList<ContentItem> items;
 
 
 
-        public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<DisplayedItem> objects) {
+        public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<ContentItem> objects) {
             super(context, resource, objects);
             this.items = new ArrayList<>(objects);
             this.context = context;
@@ -158,16 +132,32 @@ public class ContentFragment extends ListFragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
-            DisplayedItem item = getItem(position);
+            ContentItem item = getItem(position);
             int leftPadding = itemView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
             itemView.setPadding(leftPadding, itemView.getPaddingTop(), itemView.getPaddingRight(), itemView.getPaddingBottom());
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
             pageTextView.setText(""+(item.page+1));
+            View expandButton = itemView.findViewById(R.id.expand_button);
+            if(item.down.size()>0) expandButton.setOnClickListener(expandBtnClickListener);
+            else expandButton.setVisibility(View.INVISIBLE);
             return itemView;
         }
 
-
     }
+
+    private View.OnClickListener expandBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final int position = getListView().getPositionForView(v);
+            ImageView expandIcon = v.findViewById(R.id.expand_icon);
+            if(displayedItems.get(position).isExpanded) {
+                collapseItem(position);
+            } else {
+                expandItem(position);
+            }
+            adapter.notifyDataSetChanged();
+        }
+    };
 }
