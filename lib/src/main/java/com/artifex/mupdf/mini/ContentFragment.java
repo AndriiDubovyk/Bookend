@@ -27,7 +27,6 @@ public class ContentFragment extends ListFragment {
 
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
-    private ArrayList<ContentItem> contentItems;
     private ArrayList<ContentItem> displayedItems;
 
     public static class ContentItem  {
@@ -37,6 +36,7 @@ public class ContentFragment extends ListFragment {
         public int level;
         public ArrayList<ContentItem> down;
         public boolean isExpanded = false;
+
         public ContentItem(String title, String uri, int page, int level, ArrayList<ContentItem> down) {
             this.title = title;
             this.uri = uri;
@@ -44,6 +44,11 @@ public class ContentFragment extends ListFragment {
             this.level = level;
             this.down = down;
         }
+
+        public ContentItem clone() {
+            return new ContentItem(title, uri, page, level, down);
+        }
+
         public String toString() {
             String res = "";
             if(down!=null) {
@@ -62,18 +67,25 @@ public class ContentFragment extends ListFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contentItems = actionListener.getContentItems();
-        displayedItems = new ArrayList<>();
-        displayedItems.addAll(contentItems);
+        displayedItems = new ArrayList<>(actionListener.getContentItems());
         adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
     }
 
     public void updateItems() {
-        contentItems = actionListener.getContentItems();
         displayedItems.clear();
-        displayedItems.addAll(contentItems);
+        displayedItems.addAll(actionListener.getContentItems());
+        removeExpandedMark(displayedItems);
         adapter.notifyDataSetChanged();
+    }
+
+    private void removeExpandedMark(ArrayList<ContentItem> list) {
+        if(list!=null) {
+            for (ContentItem ci : list) {
+                ci.isExpanded = false;
+                removeExpandedMark(ci.down);
+            }
+        }
     }
 
     @Override
