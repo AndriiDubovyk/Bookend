@@ -36,11 +36,9 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -82,7 +80,7 @@ public class DocumentActivity extends FragmentActivity
 	protected boolean hasLoaded;
 	protected boolean isReflowable;
 	protected String title;
-	protected ArrayList<ContentFragment.Item> flatOutline;
+	protected ArrayList<ContentFragment.DisplayedItem> flatOutline;
 	protected float layoutW, layoutH;
 	protected static final float LAYOUT_EM = 1;
 	protected float displayDPI;
@@ -779,23 +777,27 @@ public class DocumentActivity extends FragmentActivity
 
 	private void loadOutline() {
 		worker.add(new Worker.Task() {
-			private void flattenOutline(Outline[] outline, String indent) {
+
+			private ArrayList<ContentFragment.ContentItem> getContentFromOutline(Outline[] outline, int level) {
+				ArrayList<ContentFragment.ContentItem> items = new ArrayList<>();
 				for (Outline node : outline) {
 					if (node.title != null)
 					{
 						int outlinePage = doc.pageNumberFromLocation(doc.resolveLink(node));
-						flatOutline.add(new ContentFragment.Item(indent + node.title, node.uri, outlinePage));
+						if (node.down != null)
+							items.add(new ContentFragment.ContentItem(node.title, node.uri, outlinePage, level, getContentFromOutline(node.down, level+1)));
+						else
+							items.add(new ContentFragment.ContentItem(node.title, node.uri, outlinePage, level, new ArrayList<>()));
 					}
-					if (node.down != null)
-						flattenOutline(node.down, indent + "    ");
 				}
+				return items;
 			}
 			public void work() {
 				Log.i(APP, "load outline");
 				Outline[] outline = doc.loadOutline();
 				if (outline != null) {
 					flatOutline = new ArrayList<>();
-					flattenOutline(outline, "");
+					contentItems = getContentFromOutline(outline, 0);
 				} else {
 					flatOutline = null;
 				}
@@ -807,30 +809,9 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	public static class ContentItem  {
-		public String title;
-		public String uri;
-		public int page;
-		public ArrayList<ContentItem> down;
-		public ContentItem(String title, String uri, int page, ArrayList<ContentItem> down) {
-			this.title = title;
-			this.uri = uri;
-			this.page = page;
-			this.down = down;
-		}
-		public String toString() {
-			String res = "";
-			if(down!=null) {
-				for(ContentItem ci : down) {
-					res += ci.toString() + ", ";
-				}
-			}
-			return title + "{ "+res +" }";
-		}
-	}
-
-	public ArrayList<ContentItem> getContentItems() {
-		return new ArrayList<>();
+	private ArrayList<ContentFragment.ContentItem> contentItems;
+	public ArrayList<ContentFragment.ContentItem> getContentItems() {
+		return contentItems;
 	}
 
 	private Location getNewLocation(Location loc, int oldChapterPageCount) {

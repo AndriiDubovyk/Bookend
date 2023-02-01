@@ -22,17 +22,57 @@ public class ContentFragment extends ListFragment {
 
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
-    private ArrayList<Item> displayedItems;
+    private ArrayList<ContentItem> contentItems;
+    private ArrayList<DisplayedItem> displayedItems;
 
-    public static class Item implements Serializable {
+    public static class ContentItem  {
         public String title;
         public String uri;
         public int page;
-        public Item(String title, String uri, int page) {
+        public int level;
+        public ArrayList<ContentItem> down;
+        public ContentItem(String title, String uri, int page, int level, ArrayList<ContentItem> down) {
             this.title = title;
             this.uri = uri;
             this.page = page;
+            this.level = level;
+            this.down = down;
         }
+        public String toString() {
+            String res = "";
+            if(down!=null) {
+                for(ContentItem ci : down) {
+                    res += ci.toString() + ", ";
+                }
+            }
+            return title + "{ "+res +" }";
+        }
+    }
+
+    public static class DisplayedItem {
+        public String title;
+        public String uri;
+        public int page;
+        public int level;
+        public ContentItem ci;
+        public boolean isExpanded = false;
+
+        public DisplayedItem(String title, String uri, int page, int level) {
+            this.title = ci.title;
+            this.uri = ci.uri;
+            this.page = ci.page;
+            this.level = ci.level;
+        }
+
+        public DisplayedItem(ContentItem ci) {
+            this.title = ci.title;
+            this.uri = ci.uri;
+            this.page = ci.page;
+            this.level = ci.level;
+            this.ci = ci;
+        }
+
+
         public String toString() {
             return title;
         }
@@ -47,24 +87,13 @@ public class ContentFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(actionListener.getContentItems()!=null) {
-            for(DocumentActivity.ContentItem ci : actionListener.getContentItems()) {
-                Log.i("mytag", "ci: "+ci.toString());
-            }
-        }
+        contentItems = actionListener.getContentItems();
 
 
 
         displayedItems = new ArrayList<>();
-        Bundle bundle = getArguments();
-        int currentPage = bundle.getInt("POSITION");
-        ArrayList<Item> outline = (ArrayList<Item>)bundle.getSerializable("OUTLINE");
-        int found = -1;
-        for (int i = 0; i < outline.size(); ++i) {
-            Item item = outline.get(i);
-            if (found < 0 && item.page >= currentPage)
-                found = i;
-            displayedItems.add(item);
+        for(ContentItem ci: contentItems) {
+            displayedItems.add(new DisplayedItem(ci));
         }
         adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
@@ -84,18 +113,43 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        Log.i("mytag", "size1 " + displayedItems.size());
-        adapter.add(new Item("title", "url", 303));
-        Log.i("mytag", "size2 " + displayedItems.size());
+        DisplayedItem di = displayedItems.get(position);
+        if(di.isExpanded) collapseItem(position);
+        else expandItem(position);
+        adapter.notifyDataSetChanged();
     }
 
-    public class ContentListAdapter extends ArrayAdapter<Item> {
+    private void expandItem(int position) {
+        DisplayedItem di = displayedItems.get(position);
+        ContentItem ci = di.ci;
+        if(!di.isExpanded) {
+            di.isExpanded = true;
+            for(int i = 0; i<ci.down.size(); i++) {
+                displayedItems.add(position+1+i, new DisplayedItem(ci.down.get(i)));
+            }
+        }
+    }
+
+    private void collapseItem(int position) {
+        DisplayedItem di = displayedItems.get(position);
+        ContentItem ci = di.ci;
+        if(di.isExpanded) {
+            di.isExpanded = false;
+            for(int i = 0; i<ci.down.size(); i++) {
+                DisplayedItem innerDi = displayedItems.get(position+1);
+                collapseItem(position+1);
+                displayedItems.remove(innerDi);
+            }
+        }
+    }
+
+    public class ContentListAdapter extends ArrayAdapter<DisplayedItem> {
         private final Context context;
-        private final ArrayList<Item> items;
+        private final ArrayList<DisplayedItem> items;
 
 
 
-        public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<Item> objects) {
+        public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<DisplayedItem> objects) {
             super(context, resource, objects);
             this.items = new ArrayList<>(objects);
             this.context = context;
@@ -105,7 +159,10 @@ public class ContentFragment extends ListFragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
-            Item item = getItem(position);
+            DisplayedItem item = getItem(position);
+            int startPadding =  itemView.getPaddingLeft()/3;
+            int additionalPadding = itemView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
+            itemView.setPadding(startPadding+additionalPadding, itemView.getPaddingTop(), itemView.getPaddingRight(), itemView.getPaddingBottom());
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
