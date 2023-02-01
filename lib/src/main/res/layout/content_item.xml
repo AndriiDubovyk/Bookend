@@ -4,14 +4,25 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:paddingLeft="16dp"
     android:descendantFocusability="blocksDescendants">
+    <TextView
+        android:id="@+id/contentTitle"
+        android:layout_width="0dp"
+        android:layout_weight="74"
+        android:paddingVertical="10dp"
+        android:paddingLeft="14dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="15.5sp"
+        android:ellipsize="end"
+        android:text=""/>
 
     <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/expand_button"
-        android:layout_width="30dp"
+        android:layout_width="0dp"
+        android:layout_weight="10"
         android:layout_height="match_parent"
-        android:paddingRight="2dp"
         android:clickable="true"
+        android:background="#ff22ff99"
         >
 
         <ImageView android:id="@+id/expand_icon"
@@ -19,31 +30,17 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:src="@drawable/ic_chevron_right_grey_24dp"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-
-
-    <TextView
-        android:id="@+id/contentTitle"
-        android:layout_width="0dp"
-        android:layout_weight="78"
-        android:paddingVertical="10dp"
-        android:paddingRight="4dp"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:textSize="15.5sp"
-        android:ellipsize="end"
-        android:text=""/>
     <TextView
         android:id="@+id/page_number"
         android:layout_width="0dp"
-        android:layout_weight="22"
+        android:layout_weight="16"
         android:paddingVertical="10dp"
         android:paddingHorizontal="2dp"
         android:layout_height="wrap_content"

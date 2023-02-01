@@ -133,9 +133,9 @@ public class ContentFragment extends ListFragment {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
             ContentItem item = getItem(position);
-            int leftPadding = itemView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
-            itemView.setPadding(leftPadding, itemView.getPaddingTop(), itemView.getPaddingRight(), itemView.getPaddingBottom());
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
+            int leftPadding = titleTextView.getPaddingLeft()/2 + titleTextView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
+            titleTextView.setPadding(leftPadding, titleTextView.getPaddingTop(), titleTextView.getPaddingRight(), titleTextView.getPaddingBottom());
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
             pageTextView.setText(""+(item.page+1));
