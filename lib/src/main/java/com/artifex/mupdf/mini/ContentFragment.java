@@ -23,6 +23,7 @@ public class ContentFragment extends ListFragment {
 
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
+    private ArrayList<Item> items;
 
     public static class Item implements Serializable {
         public String title;
@@ -47,7 +48,7 @@ public class ContentFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("mytag", "contetn on create");
-        ArrayList<Item> items = new ArrayList<>();
+        items = new ArrayList<>();
         Bundle bundle = getArguments();
         int currentPage = bundle.getInt("POSITION");
         ArrayList<Item> outline = (ArrayList<Item>)bundle.getSerializable("OUTLINE");
@@ -63,18 +64,6 @@ public class ContentFragment extends ListFragment {
 
     }
 
-    public void updateContent(ArrayList<Item> outline) {
-        if(adapter == null) {
-            adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, outline);
-            setListAdapter(adapter);
-        } else {
-            Log.i("mytag", "updateContent");
-            adapter.clear();
-            adapter.addAll(outline);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -88,9 +77,6 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        Item item = (adapter.getItem(position));
-        actionListener.gotoPage(item.page);
-        actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
     }
 
     public class ContentListAdapter extends ArrayAdapter<Item> {

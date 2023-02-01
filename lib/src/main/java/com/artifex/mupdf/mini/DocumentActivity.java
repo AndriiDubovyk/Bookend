@@ -376,14 +376,13 @@ public class DocumentActivity extends FragmentActivity
 			case CONTENT:
 				if(currentFragmentState == FragmentsState.CONTENT) return;
 				currentFragmentState = FragmentsState.CONTENT;
-				Bundle bundle = new Bundle();
-				bundle.putInt("POSITION", currentPage);
-				bundle.putSerializable("OUTLINE", flatOutline);
-				contentFragment.setArguments(bundle);
 				if(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
-					contentFragment.updateContent(flatOutline);
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
 				} else {
+					Bundle bundle = new Bundle();
+					bundle.putInt("POSITION", currentPage);
+					bundle.putSerializable("OUTLINE", flatOutline);
+					contentFragment.setArguments(bundle);
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();
 				}
 				// hide other fragments
