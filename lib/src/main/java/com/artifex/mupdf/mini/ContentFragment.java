@@ -1,5 +1,6 @@
 package com.artifex.mupdf.mini;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -152,8 +153,12 @@ public class ContentFragment extends ListFragment {
             TextView pageTextView = itemView.findViewById(R.id.page_number);
             pageTextView.setText(""+(item.page+1));
             View expandButton = itemView.findViewById(R.id.expand_button);
-            if(item.down.size()>0) expandButton.setOnClickListener(expandBtnClickListener);
-            else expandButton.setVisibility(View.INVISIBLE);
+            if(item.down.size()>0) {
+                expandButton.setOnClickListener(expandBtnClickListener);
+                if(item.isExpanded) expandButton.setRotation(90f);
+            } else {
+                expandButton.setVisibility(View.INVISIBLE);
+            }
             return itemView;
         }
 
