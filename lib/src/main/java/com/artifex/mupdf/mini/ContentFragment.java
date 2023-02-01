@@ -1,5 +1,6 @@
 package com.artifex.mupdf.mini;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class ContentFragment extends ListFragment {
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
     private ArrayList<ContentItem> displayedItems;
+    private int selectedItem = -1;
 
     public static class ContentItem  {
         public String title;
@@ -72,6 +74,10 @@ public class ContentFragment extends ListFragment {
         setListAdapter(adapter);
     }
 
+
+
+
+
     public void updateItems() {
         displayedItems.clear();
         displayedItems.addAll(actionListener.getContentItems());
@@ -101,7 +107,7 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        ContentItem ci = (ContentItem) (adapter.getItem(position));
+        ContentItem ci = adapter.getItem(position);
         actionListener.gotoPage(ci.page);
         actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
     }
@@ -144,6 +150,8 @@ public class ContentFragment extends ListFragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
+            if(position==selectedItem)
+                itemView.setBackgroundColor(getResources().getColor(R.color.blue_selection_color));
             ContentItem item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             int leftPadding = titleTextView.getPaddingLeft()/2 + titleTextView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
@@ -152,8 +160,12 @@ public class ContentFragment extends ListFragment {
             TextView pageTextView = itemView.findViewById(R.id.page_number);
             pageTextView.setText(""+(item.page+1));
             View expandButton = itemView.findViewById(R.id.expand_button);
-            if(item.down.size()>0) expandButton.setOnClickListener(expandBtnClickListener);
-            else expandButton.setVisibility(View.INVISIBLE);
+            if(item.down.size()>0) {
+                expandButton.setOnClickListener(expandBtnClickListener);
+                if(item.isExpanded) expandButton.setRotation(90f);
+            } else {
+                expandButton.setVisibility(View.INVISIBLE);
+            }
             return itemView;
         }
 
@@ -163,7 +175,6 @@ public class ContentFragment extends ListFragment {
         @Override
         public void onClick(View v) {
             final int position = getListView().getPositionForView(v);
-            ImageView expandIcon = v.findViewById(R.id.expand_icon);
             if(displayedItems.get(position).isExpanded) {
                 collapseItem(position);
             } else {

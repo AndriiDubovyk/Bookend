@@ -2,4 +2,5 @@
 <resources>
     <color name="main_ui_color">#907838</color>
     <color name="main_ui_text_color">#FFFFFF</color>
+    <color name="blue_selection_color">#3E7C70</color>
 </resources>
