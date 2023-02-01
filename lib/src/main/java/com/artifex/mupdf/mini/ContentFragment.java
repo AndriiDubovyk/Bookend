@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,7 +22,7 @@ public class ContentFragment extends ListFragment {
 
     private DocumentActivity actionListener;
     private ContentListAdapter adapter;
-    private ArrayList<Item> items;
+    private ArrayList<Item> displayedItems;
 
     public static class Item implements Serializable {
         public String title;
@@ -48,7 +47,7 @@ public class ContentFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("mytag", "contetn on create");
-        items = new ArrayList<>();
+        displayedItems = new ArrayList<>();
         Bundle bundle = getArguments();
         int currentPage = bundle.getInt("POSITION");
         ArrayList<Item> outline = (ArrayList<Item>)bundle.getSerializable("OUTLINE");
@@ -57,15 +56,16 @@ public class ContentFragment extends ListFragment {
             Item item = outline.get(i);
             if (found < 0 && item.page >= currentPage)
                 found = i;
-            items.add(item);
+            displayedItems.add(item);
         }
-        adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, items);
+        adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
 
     }
 
     @Override
     public void onAttach(Activity activity) {
+        Log.i("mytag", "contetn on attach");
         super.onAttach(activity);
         try {
             actionListener = (DocumentActivity) activity;
@@ -77,11 +77,16 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        Log.i("mytag", "size1 " + displayedItems.size());
+        adapter.add(new Item("title", "url", 303));
+        Log.i("mytag", "size2 " + displayedItems.size());
     }
 
     public class ContentListAdapter extends ArrayAdapter<Item> {
         private final Context context;
         private final ArrayList<Item> items;
+
+
 
         public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<Item> objects) {
             super(context, resource, objects);
@@ -93,7 +98,7 @@ public class ContentFragment extends ListFragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
-            Item item = items.get(position);
+            Item item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
