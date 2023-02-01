@@ -2,29 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:paddingVertical="1dp"
-    android:paddingLeft="21dp">
+    android:clickable="true"
+    android:paddingLeft="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/expand_button"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        >
+
+        <ImageView android:id="@+id/expand_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/ic_chevron_right_grey_24dp"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
 
     <TextView
         android:id="@+id/contentTitle"
         android:layout_width="0dp"
         android:layout_weight="78"
+        android:paddingVertical="10dp"
         android:paddingRight="4dp"
         android:layout_height="wrap_content"
         android:textColor="#000000"
-        android:textSize="18.5sp"
+        android:textSize="15.5sp"
         android:ellipsize="end"
         android:text=""/>
     <TextView
         android:id="@+id/page_number"
         android:layout_width="0dp"
         android:layout_weight="22"
+        android:paddingVertical="10dp"
         android:paddingHorizontal="2dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:textColor="#000000"
-        android:textSize="18.5sp"
+        android:textSize="15.5sp"
+        android:layout_gravity="center_vertical"
         android:gravity="center"
         android:textAlignment="center"
         android:text="2"/>

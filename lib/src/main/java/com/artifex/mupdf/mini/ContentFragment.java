@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -80,7 +82,6 @@ public class ContentFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.content_fragment, null);
     }
 
@@ -88,8 +89,6 @@ public class ContentFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         contentItems = actionListener.getContentItems();
-
-
 
         displayedItems = new ArrayList<>();
         for(ContentItem ci: contentItems) {
@@ -160,9 +159,8 @@ public class ContentFragment extends ListFragment {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
             DisplayedItem item = getItem(position);
-            int startPadding =  itemView.getPaddingLeft()/3;
-            int additionalPadding = itemView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
-            itemView.setPadding(startPadding+additionalPadding, itemView.getPaddingTop(), itemView.getPaddingRight(), itemView.getPaddingBottom());
+            int leftPadding = itemView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
+            itemView.setPadding(leftPadding, itemView.getPaddingTop(), itemView.getPaddingRight(), itemView.getPaddingBottom());
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
