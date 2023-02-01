@@ -381,6 +381,7 @@ public class DocumentActivity extends FragmentActivity
 				bundle.putSerializable("OUTLINE", flatOutline);
 				contentFragment.setArguments(bundle);
 				if(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
+					contentFragment.updateContent(flatOutline);
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
 				} else {
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();
@@ -479,12 +480,10 @@ public class DocumentActivity extends FragmentActivity
 					Log.i(APP, "relayout document");
 					doc.layout(layoutW, layoutH, LAYOUT_EM);
 					pageCount = doc.countPages();
-					if(oldChapterPages!=doc.countPages(loadedLoc.chapter)) {
-						Location newLoc = getNewLocation(loadedLoc, oldChapterPages);
-						currentPage = doc.pageNumberFromLocation(newLoc);
-						if(currentPage<0) currentPage = 0;
-						else if (currentPage>=pageCount) currentPage=pageCount-1;
-					}
+					Location newLoc = getNewLocation(loadedLoc, oldChapterPages);
+					currentPage = doc.pageNumberFromLocation(newLoc);
+					if(currentPage<0) currentPage = 0;
+					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					pageCount = 1;
 					currentPage = 0;
@@ -493,8 +492,8 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 				updatePageNumberInfo(currentPage);
-				loadOrUpdatePage(currentPage);
 				loadOutline();
 			}
 		});
@@ -715,12 +714,10 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
-					if(oldChapterPageCount!=doc.countPages(loadedLoc.chapter)) {
-						Location newLoc = getNewLocation(loadedLoc, oldChapterPageCount);
-						currentPage = doc.pageNumberFromLocation(newLoc);
-						if(currentPage<0) currentPage = 0;
-						else if (currentPage>=pageCount) currentPage=pageCount-1;
-					}
+					Location newLoc = getNewLocation(loadedLoc, oldChapterPageCount);
+					currentPage = doc.pageNumberFromLocation(newLoc);
+					if(currentPage<0) currentPage = 0;
+					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -729,13 +726,10 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				readerView.getAdapter().notifyDataSetChanged();
-				if (currentPage < 0 || currentPage >= pageCount)
-					currentPage = 0;
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
-				readerView.setCurrentItem(currentPage, false);
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 				updatePageNumberInfo(currentPage);
 				loadOutline();
 
@@ -757,12 +751,10 @@ public class DocumentActivity extends FragmentActivity
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
 					pageCount = doc.countPages();
-					if(oldChapterPages!=doc.countPages(oldLoc.chapter)) {
-						Location newLoc = getNewLocation(oldLoc, oldChapterPages);
-						currentPage = doc.pageNumberFromLocation(newLoc);
-						if(currentPage<0) currentPage = 0;
-						else if (currentPage>=pageCount) currentPage=pageCount-1;
-					}
+					Location newLoc = getNewLocation(oldLoc, oldChapterPages);
+					currentPage = doc.pageNumberFromLocation(newLoc);
+					if(currentPage<0) currentPage = 0;
+					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -772,10 +764,7 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
-				readerView.getAdapter().notifyDataSetChanged();
-				if (currentPage < 0 || currentPage >= pageCount)
-					currentPage = 0;
-				readerView.setCurrentItem(currentPage, false);
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 				updatePageNumberInfo(currentPage);
 				loadOutline();
 			}

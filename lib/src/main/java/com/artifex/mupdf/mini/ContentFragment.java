@@ -22,7 +22,7 @@ import java.util.List;
 public class ContentFragment extends ListFragment {
 
     private DocumentActivity actionListener;
-    private ListAdapter adapter;
+    private ContentListAdapter adapter;
 
     public static class Item implements Serializable {
         public String title;
@@ -63,6 +63,18 @@ public class ContentFragment extends ListFragment {
 
     }
 
+    public void updateContent(ArrayList<Item> outline) {
+        if(adapter == null) {
+            adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, outline);
+            setListAdapter(adapter);
+        } else {
+            Log.i("mytag", "updateContent");
+            adapter.clear();
+            adapter.addAll(outline);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -76,7 +88,7 @@ public class ContentFragment extends ListFragment {
     @Override
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        Item item = (Item) (adapter.getItem(position));
+        Item item = (adapter.getItem(position));
         actionListener.gotoPage(item.page);
         actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
     }
@@ -99,7 +111,7 @@ public class ContentFragment extends ListFragment {
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
-            pageTextView.setText(""+item.page);
+            pageTextView.setText(""+(item.page+1));
             return itemView;
         }
 
