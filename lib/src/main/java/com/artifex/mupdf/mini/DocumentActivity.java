@@ -40,6 +40,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -804,6 +805,32 @@ public class DocumentActivity extends FragmentActivity
 					outlineButton.setVisibility(View.VISIBLE);
 			}
 		});
+	}
+
+	public static class ContentItem  {
+		public String title;
+		public String uri;
+		public int page;
+		public ArrayList<ContentItem> down;
+		public ContentItem(String title, String uri, int page, ArrayList<ContentItem> down) {
+			this.title = title;
+			this.uri = uri;
+			this.page = page;
+			this.down = down;
+		}
+		public String toString() {
+			String res = "";
+			if(down!=null) {
+				for(ContentItem ci : down) {
+					res += ci.toString() + ", ";
+				}
+			}
+			return title + "{ "+res +" }";
+		}
+	}
+
+	public ArrayList<ContentItem> getContentItems() {
+		return new ArrayList<>();
 	}
 
 	private Location getNewLocation(Location loc, int oldChapterPageCount) {

@@ -46,7 +46,15 @@ public class ContentFragment extends ListFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("mytag", "contetn on create");
+
+        if(actionListener.getContentItems()!=null) {
+            for(DocumentActivity.ContentItem ci : actionListener.getContentItems()) {
+                Log.i("mytag", "ci: "+ci.toString());
+            }
+        }
+
+
+
         displayedItems = new ArrayList<>();
         Bundle bundle = getArguments();
         int currentPage = bundle.getInt("POSITION");
@@ -65,7 +73,6 @@ public class ContentFragment extends ListFragment {
 
     @Override
     public void onAttach(Activity activity) {
-        Log.i("mytag", "contetn on attach");
         super.onAttach(activity);
         try {
             actionListener = (DocumentActivity) activity;
