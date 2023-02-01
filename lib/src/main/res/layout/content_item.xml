@@ -21,8 +21,8 @@
         android:layout_width="0dp"
         android:layout_weight="10"
         android:layout_height="match_parent"
+        android:background="@drawable/rect_button"
         android:clickable="true"
-        android:background="#ff22ff99"
         >
 
         <ImageView android:id="@+id/expand_icon"
