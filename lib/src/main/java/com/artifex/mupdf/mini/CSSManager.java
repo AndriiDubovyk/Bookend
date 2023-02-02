@@ -18,7 +18,7 @@ public class CSSManager {
         float realFontSize = MIN_REAL_FONT_SIZE_EM + 0.5f * fontSize;
         StringBuilder builder = new StringBuilder();
         builder
-                .append("body {font-size: ")
+                .append("body {margin: 0 !important; padding: 0 !important; font-size: ")
                 .append(realFontSize).append("em !important; font-family: ")
                 .append(FONTS.get(font)).append(" !important;} p{text-align: ")
                 .append(textAlign).append(" !important;} p.center{text-align: center !important;}")

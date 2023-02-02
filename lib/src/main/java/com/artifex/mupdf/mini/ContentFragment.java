@@ -72,17 +72,53 @@ public class ContentFragment extends ListFragment {
         displayedItems = new ArrayList<>(actionListener.getContentItems());
         adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
+        ArrayList<Integer> indices = getContentItemIndicesByPage(displayedItems, actionListener.currentPage);
+        processExpansionWithIndices(indices);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        setSelection(selectedItem);
+    }
 
+    private ArrayList<Integer> getContentItemIndicesByPage(ArrayList<ContentItem> items, int page) {
+        int index = -1;
+        for(int i = 0; i<items.size(); i++) {
+            ContentItem ci = items.get(i);
+            if(page>=ci.page) {
+                index = i;
+            }
+        }
+        ArrayList<Integer> indices = new ArrayList<>();
+        if(index>=0) {
+            indices.add(index);
+            ArrayList<ContentItem> childItems = items.get(index).down;
+            if(childItems.size()>0)
+                indices.addAll(getContentItemIndicesByPage(childItems, page));
+        }
+        return indices;
+    }
 
-
+    public void processExpansionWithIndices(ArrayList<Integer> indices) {
+        selectedItem = -1;
+        int shift = 0;
+        for(int k = 0; k<indices.size(); k++) {
+            int index = shift+indices.get(k);
+            shift=index+1;
+            expandItem(index);
+            selectedItem = index;
+        }
+    }
 
     public void updateItems() {
         displayedItems.clear();
         displayedItems.addAll(actionListener.getContentItems());
         removeExpandedMark(displayedItems);
-        adapter.notifyDataSetChanged();
+        ArrayList<Integer> indices = getContentItemIndicesByPage(displayedItems, actionListener.currentPage);
+        processExpansionWithIndices(indices);
+        setListAdapter(getListAdapter());
+        getListView().setSelection(selectedItem);
     }
 
     private void removeExpandedMark(ArrayList<ContentItem> list) {
@@ -116,8 +152,16 @@ public class ContentFragment extends ListFragment {
         ContentItem di = displayedItems.get(position);
         if(!di.isExpanded) {
             di.isExpanded = true;
+            if(position<selectedItem) selectedItem+=di.down.size();
             for(int i = 0; i<di.down.size(); i++) {
-                displayedItems.add(position+1+i, di.down.get(i));
+                ContentItem innerDi = di.down.get(i);
+                int insertPos = position+1+i;
+                if(position>=selectedItem) {
+                    if(actionListener.currentPage>=innerDi.page) {
+                        selectedItem = insertPos;
+                    }
+                }
+                displayedItems.add(insertPos, innerDi);
             }
         }
     }
@@ -131,6 +175,10 @@ public class ContentFragment extends ListFragment {
                 collapseItem(position+1);
                 displayedItems.remove(innerDi);
             }
+            // calculate new selection mark
+            if(selectedItem<position) selectedItem-=di.down.size();
+            else if (selectedItem>position && selectedItem<=position+di.down.size())  selectedItem = position;
+
         }
     }
 
