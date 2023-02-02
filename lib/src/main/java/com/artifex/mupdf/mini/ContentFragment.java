@@ -1,26 +1,19 @@
 package com.artifex.mupdf.mini;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.ListFragment;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,9 +192,10 @@ public class ContentFragment extends ListFragment {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
             if(position==selectedItem)
-                itemView.setBackgroundColor(getResources().getColor(R.color.blue_selection_color));
+                itemView.setBackgroundColor(getResources().getColor(R.color.content_selection_color));
             ContentItem item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
+            if(item.down.size()>0) titleTextView.setTypeface(titleTextView.getTypeface(), Typeface.BOLD);
             int leftPadding = titleTextView.getPaddingLeft()/2 + titleTextView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
             titleTextView.setPadding(leftPadding, titleTextView.getPaddingTop(), titleTextView.getPaddingRight(), titleTextView.getPaddingBottom());
             titleTextView.setText(item.title);
