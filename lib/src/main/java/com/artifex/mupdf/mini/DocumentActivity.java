@@ -3,7 +3,6 @@ package com.artifex.mupdf.mini;
 import com.artifex.mupdf.fitz.*;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -23,10 +22,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -60,10 +57,12 @@ public class DocumentActivity extends FragmentActivity
 
 	enum FragmentsState {
 		NONE,
-		CONTENT
+		CONTENT,
+		SETTINGS
 	}
 
 	private static final String FRAGMENT_CONTENT_TAG = "FRAGMENT_CONTENT_TAG";
+	private static final String FRAGMENT_SETTINGS_TAG = "SETTINGS_CONTENT_TAG";
 
 	// We must keep all this info for cases with screen size change
 	protected String key;
@@ -95,7 +94,7 @@ public class DocumentActivity extends FragmentActivity
 	protected View searchCloseButton;
 	protected View searchBackwardButton;
 	protected View searchForwardButton;
-	protected View layoutButton;
+	protected View settingsButton;
 	protected PopupMenu layoutPopupMenu;
 	protected View outlineButton;
 	protected View navigationBar;
@@ -115,6 +114,7 @@ public class DocumentActivity extends FragmentActivity
 	private DocumentActivity actionListener;
 
 	protected ContentFragment contentFragment = new ContentFragment();
+	protected SettingsFragment settingsFragment = new SettingsFragment();
 
 
 	private void openInput(Uri uri, long size, String mimetype) throws IOException {
@@ -332,28 +332,14 @@ public class DocumentActivity extends FragmentActivity
 			}
 		});
 
-		layoutButton = findViewById(R.id.layout_button);
-		layoutPopupMenu = new PopupMenu(this, layoutButton);
-		layoutPopupMenu.getMenuInflater().inflate(R.menu.layout_menu, layoutPopupMenu.getMenu());
-		layoutPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-			public boolean onMenuItemClick(MenuItem item) {
-				int oldFontSize = cssManager.fontSize;
-				int id = item.getItemId();
-				if (id == R.id.font_size_4) cssManager.fontSize=4;
-				else if (id == R.id.font_size_9) cssManager.fontSize = 9;
-				else if (id == R.id.font_size_10) cssManager.fontSize = 10;
-				else if (id == R.id.font_size_12) cssManager.fontSize = 12;
-				else if (id == R.id.font_size_13) cssManager.fontSize = 13;
-				else if (id == R.id.font_size_14) cssManager.fontSize = 14;
-				else if (id == R.id.font_size_15) cssManager.fontSize = 15;
-				if (oldFontSize != cssManager.fontSize)
-					reopenDocument();
-				return true;
-			}
-		});
-		layoutButton.setOnClickListener(new View.OnClickListener() {
+		settingsButton = findViewById(R.id.settings_button);
+		settingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				layoutPopupMenu.show();
+				if(currentFragmentState == FragmentsState.SETTINGS) {
+					manageFragmentTransaction(FragmentsState.NONE);
+				} else {
+					manageFragmentTransaction(FragmentsState.SETTINGS);
+				}
 			}
 		});
 		readerView = findViewById(R.id.reader_view);
@@ -412,12 +398,32 @@ public class DocumentActivity extends FragmentActivity
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();
 				}
 				// hide other fragments
+				if (fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).hide(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)).commit();
+				}
+				break;
+			case SETTINGS:
+				if(currentFragmentState == FragmentsState.SETTINGS) return;
+				currentFragmentState = FragmentsState.SETTINGS;
+				if(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)).commit();
+				} else {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, settingsFragment, FRAGMENT_SETTINGS_TAG).commit();
+				}
+				// hide other fragments
+				if (fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).hide(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
+				}
 				break;
 			case NONE:
 				if(currentFragmentState == FragmentsState.NONE) return;
 				currentFragmentState = FragmentsState.NONE;
+				// hide other fragments
 				if (fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).hide(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
+				}
+				if (fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)!=null) {
+					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).hide(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)).commit();
 				}
 				break;
 		}
@@ -762,7 +768,7 @@ public class DocumentActivity extends FragmentActivity
 				progressBar.setVisibility(View.INVISIBLE);
 				titleLabel.setText(title);
 				if (isReflowable)
-					layoutButton.setVisibility(View.VISIBLE);
+					settingsButton.setVisibility(View.VISIBLE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 
