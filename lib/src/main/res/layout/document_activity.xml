@@ -36,12 +36,14 @@
 
 	<LinearLayout android:id="@+id/action_bar"
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
+		android:layout_height="wrap_content"
 		app:layout_constraintTop_toTopOf="parent"
 		android:orientation="horizontal"
+		android:paddingBottom="4dp"
 		android:background="@color/main_ui_color"
 		android:visibility="invisible"
 		>
+
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -127,8 +129,9 @@
 	</LinearLayout>
 	<LinearLayout android:id="@+id/search_bar"
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
+		android:layout_height="wrap_content"
 		app:layout_constraintTop_toTopOf="parent"
+		android:paddingVertical="2dp"
 		android:orientation="horizontal"
 		android:background="@color/main_ui_color"
 		android:visibility="invisible"
@@ -182,6 +185,7 @@
 		android:orientation="vertical"
 		android:background="@color/main_ui_color"
 		android:visibility="invisible"
+		android:paddingBottom="4dp"
 		>
 		<SeekBar android:id="@+id/page_seekbar"
 			android:layout_width="match_parent"

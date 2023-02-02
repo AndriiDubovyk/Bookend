@@ -20,6 +20,7 @@ import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.DisplayCutout;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -172,8 +173,10 @@ public class DocumentActivity extends FragmentActivity
 		setContentView(R.layout.document_activity);
 		cssManager = new CSSManager();
 
+		Log.v("mytag","onCreate=");
 		progressBar = findViewById(R.id.progress_bar);
 		actionBar = findViewById(R.id.action_bar);
+
 		searchBar = findViewById(R.id.search_bar);
 		navigationBar = findViewById(R.id.navigation_bar);
 
@@ -359,6 +362,37 @@ public class DocumentActivity extends FragmentActivity
 		readerView = findViewById(R.id.reader_view);
 		readerView.setActionListener(actionListener);
 		readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
+	}
+
+	private void setCutoutMargin(int cutoutMargin) {
+		if(actionBar==null) return;
+		actionBar.setPadding(
+				actionBar.getPaddingLeft(),
+				actionBar.getPaddingTop()+cutoutMargin,
+				actionBar.getPaddingRight(),
+				actionBar.getPaddingBottom());
+		searchBar.setPadding(
+				searchBar.getPaddingLeft(),
+				searchBar.getPaddingTop()+cutoutMargin,
+				searchBar.getPaddingRight(),
+				searchBar.getPaddingBottom());
+	}
+
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		int cutoutMargin = 0;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
+			if (displayCutout.getBoundingRects().size()>0) {
+				android.graphics.Rect notchRect = displayCutout.getBoundingRects().get(0);
+				cutoutMargin = notchRect.height();
+			}
+		} else {
+			cutoutMargin = 0;
+		}
+		Log.v("mytag","notch height in pixels="+cutoutMargin);
+		setCutoutMargin(cutoutMargin);
 	}
 
 	private void loadPrefs() {
@@ -595,7 +629,6 @@ public class DocumentActivity extends FragmentActivity
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
 		pageSeekbar.setProgress(currentPage);
-		Log.i("mytag", "update page info ");
 		String chapterName = DEFAULT_CHAPTER_NAME;
 		int chapterFirstPage = 0;
 		int nextChapterFirstPage = pageCount;
@@ -604,7 +637,6 @@ public class DocumentActivity extends FragmentActivity
 			ArrayList<ContentFragment.ContentItem> items = new ArrayList<>(contentItems);
 			for(int i : chapterIndices) {
 				chapterName = items.get(i).title;
-				Log.i("mytag", "chapterName "+chapterName);
 				chapterFirstPage = items.get(i).page;
 				if(i+1<items.size()) nextChapterFirstPage = items.get(i+1).page;
 				items = items.get(i).down;
@@ -746,6 +778,22 @@ public class DocumentActivity extends FragmentActivity
 
 			}
 		});
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		//This is used to hide/show 'Status Bar' & 'System Bar'. Swip bar to get it as visible.
+		View decorView = getWindow().getDecorView();
+		if (hasFocus) {
+			decorView.setSystemUiVisibility(
+					View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+							| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+							| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+							| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+							| View.SYSTEM_UI_FLAG_FULLSCREEN
+							| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+		}
 	}
 
 	protected void reloadDocument(Location oldLoc, int oldChapterPages) {
