@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
+    android:background="@drawable/rect_button"
     android:descendantFocusability="blocksDescendants">
     <TextView
         android:id="@+id/contentTitle"

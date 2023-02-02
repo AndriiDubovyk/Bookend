@@ -1,5 +1,7 @@
 package com.artifex.mupdf.mini;
 
+import android.util.Log;
+
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Location;
 
@@ -31,6 +33,15 @@ public class BookLocation {
     }
 
     public static float getReadProgress(int current, int count) {
+        if(count <= 1) return 1f;
         return ((float) current) / (count - 1);
+    }
+
+    @Override
+    public String toString() {
+        return "BookLocation{" +
+                "chapter=" + chapter +
+                ", chapterProgress=" + chapterProgress +
+                '}';
     }
 }
