@@ -29,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,6 +104,7 @@ public class DocumentActivity extends FragmentActivity
 	protected SeekBar pageSeekbar;
 	protected TextView chapterLabel;
 	protected TextView chapterPageLabel;
+	protected ProgressBar progressBar;
 
 	private CSSManager cssManager;
 	protected int pageCount;
@@ -170,7 +172,7 @@ public class DocumentActivity extends FragmentActivity
 		setContentView(R.layout.document_activity);
 		cssManager = new CSSManager();
 
-
+		progressBar = findViewById(R.id.progress_bar);
 		actionBar = findViewById(R.id.action_bar);
 		searchBar = findViewById(R.id.search_bar);
 		navigationBar = findViewById(R.id.navigation_bar);
@@ -446,6 +448,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	protected void openDocument() {
+		progressBar.setVisibility(View.VISIBLE);
 		worker.add(new Worker.Task() {
 			boolean needsPassword;
 			public void work() {
@@ -734,6 +737,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				progressBar.setVisibility(View.INVISIBLE);
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
