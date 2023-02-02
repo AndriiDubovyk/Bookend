@@ -173,7 +173,6 @@ public class DocumentActivity extends FragmentActivity
 		setContentView(R.layout.document_activity);
 		cssManager = new CSSManager();
 
-		Log.v("mytag","onCreate=");
 		progressBar = findViewById(R.id.progress_bar);
 		actionBar = findViewById(R.id.action_bar);
 
@@ -391,7 +390,7 @@ public class DocumentActivity extends FragmentActivity
 		} else {
 			cutoutMargin = 0;
 		}
-		Log.v("mytag","notch height in pixels="+cutoutMargin);
+		Log.v(APP,"notch height in pixels="+cutoutMargin);
 		setCutoutMargin(cutoutMargin);
 	}
 
