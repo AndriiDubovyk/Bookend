@@ -486,9 +486,8 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
-				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
-				updatePageNumberInfo(currentPage);
 				loadOutline();
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 			}
 		});
 	}
@@ -584,8 +583,7 @@ public class DocumentActivity extends FragmentActivity
 				startActivity(intent);
 			}
 		} else {
-			currentPage = history.pop();
-			loadOrUpdatePage(currentPage);
+			loadOrUpdatePage(history.pop());
 		}
 	}
 
@@ -594,13 +592,29 @@ public class DocumentActivity extends FragmentActivity
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
 		pageSeekbar.setProgress(currentPage);
+		Log.i("mytag", "update page info ");
+		String chapterName = DEFAULT_CHAPTER_NAME;
+		int chapterFirstPage = 0;
+		int nextChapterFirstPage = pageCount;
+		if(contentItems!=null) {
+			ArrayList<Integer> chapterIndices = ContentFragment.getContentItemIndicesByPage(contentItems, currentPage);
+			ArrayList<ContentFragment.ContentItem> items = new ArrayList<>(contentItems);
+			for(int i : chapterIndices) {
+				chapterName = items.get(i).title;
+				Log.i("mytag", "chapterName "+chapterName);
+				chapterFirstPage = items.get(i).page;
+				if(i+1<items.size()) nextChapterFirstPage = items.get(i+1).page;
+				items = items.get(i).down;
+			}
+			if(contentItems.size()>0 && currentPage < contentItems.get(0).page) {
+				nextChapterFirstPage = contentItems.get(0).page;
+			}
+		}
 
-//		String chapterName = DEFAULT_CHAPTER_NAME;
-//		int chapterCurrentPage = 0;
-//		int chapterMaxPages = 0;
-//
-//		chapterLabel.setText(chapterName);
-//		chapterPageLabel.setText("- "+(chapterCurrentPage+1)+" / "+chapterMaxPages);
+		int chapterCurrentPage = currentPage-chapterFirstPage;
+		int chapterMaxPages = nextChapterFirstPage-chapterFirstPage;
+		chapterLabel.setText(chapterName);
+		chapterPageLabel.setText(" - "+(chapterCurrentPage+1)+" / "+chapterMaxPages);
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {
@@ -723,9 +737,8 @@ public class DocumentActivity extends FragmentActivity
 				titleLabel.setText(title);
 				if (isReflowable)
 					layoutButton.setVisibility(View.VISIBLE);
-				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
-				updatePageNumberInfo(currentPage);
 				loadOutline();
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 
 			}
 		});
@@ -758,9 +771,8 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
-				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
-				updatePageNumberInfo(currentPage);
 				loadOutline();
+				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 			}
 		});
 	}
@@ -798,6 +810,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				updatePageNumberInfo(currentPage);
 				if (contentItems != null)
 					outlineButton.setVisibility(View.VISIBLE);
 			}
@@ -870,6 +883,7 @@ public class DocumentActivity extends FragmentActivity
 		if (p >= 0 && p < pageCount && p != currentPage) {
 			history.push(currentPage);
 			currentPage = p;
+			updatePageNumberInfo(currentPage);
 			readerView.setCurrentItem(p, false);
 		}
 	}

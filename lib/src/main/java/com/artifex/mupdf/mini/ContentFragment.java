@@ -82,7 +82,7 @@ public class ContentFragment extends ListFragment {
         setSelection(selectedItem);
     }
 
-    private ArrayList<Integer> getContentItemIndicesByPage(ArrayList<ContentItem> items, int page) {
+    public static ArrayList<Integer> getContentItemIndicesByPage(ArrayList<ContentItem> items, int page) {
         int index = -1;
         for(int i = 0; i<items.size(); i++) {
             ContentItem ci = items.get(i);
