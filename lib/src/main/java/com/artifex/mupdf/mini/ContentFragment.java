@@ -99,7 +99,7 @@ public class ContentFragment extends ListFragment {
         for(int k = 0; k<indices.size(); k++) {
             int index = shift+indices.get(k);
             shift=index+1;
-            expandItem(index);
+            if(k<indices.size()-1) expandItem(index);
             selectedItem = index;
         }
     }
@@ -177,13 +177,11 @@ public class ContentFragment extends ListFragment {
 
     private class ContentListAdapter extends ArrayAdapter<ContentItem> {
         private final Context context;
-        private final ArrayList<ContentItem> items;
 
 
 
         public ContentListAdapter(@NonNull Context context, int resource, @NonNull List<ContentItem> objects) {
             super(context, resource, objects);
-            this.items = new ArrayList<>(objects);
             this.context = context;
         }
 
