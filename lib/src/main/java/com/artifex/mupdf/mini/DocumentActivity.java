@@ -657,7 +657,6 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void updatePageNumberInfo(int newPageNumber) {
-		Log.i("mytag", "updatePageNumberInfo "+newPageNumber);
 		currentPage = newPageNumber;
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
