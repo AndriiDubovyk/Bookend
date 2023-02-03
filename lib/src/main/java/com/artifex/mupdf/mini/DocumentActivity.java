@@ -351,12 +351,12 @@ public class DocumentActivity extends FragmentActivity
 		if(actionBar==null) return;
 		actionBar.setPadding(
 				actionBar.getPaddingLeft(),
-				actionBar.getPaddingTop()+cutoutMargin,
+				cutoutMargin,
 				actionBar.getPaddingRight(),
 				actionBar.getPaddingBottom());
 		searchBar.setPadding(
 				searchBar.getPaddingLeft(),
-				searchBar.getPaddingTop()+cutoutMargin,
+				cutoutMargin,
 				searchBar.getPaddingRight(),
 				searchBar.getPaddingBottom());
 	}
@@ -367,7 +367,7 @@ public class DocumentActivity extends FragmentActivity
 		int cutoutMargin = 0;
 		 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-			if (displayCutout.getBoundingRects().size()>0) {
+			if (displayCutout!=null && displayCutout.getBoundingRects().size()>0) {
 				android.graphics.Rect notchRect = displayCutout.getBoundingRects().get(0);
 				cutoutMargin = notchRect.height();
 			}
