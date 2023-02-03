@@ -466,27 +466,29 @@ public class DocumentActivity extends FragmentActivity
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
 		layoutH = canvasH * 72 / displayDPI;
-		Log.v(APP, "NoRelayout: width="+w+", height="+h + " canvasW="+canvasW+", canvasH="+canvasH);
 		if (!hasLoaded) {
 			processCutout();
-			callFullscreen(); // if possible
 			oldW = w;
 			oldH = h;
 			hasLoaded = true;
 			openDocument();
 		} else if(isReflowable && (oldW != w || oldH != h) && !isRelayoutingNow) {
 			processCutout();
-			callFullscreen(); // if possible
+			canvasW = w;
+			canvasH = h;
+			layoutW = canvasW * 72 / displayDPI;
+			layoutH = canvasH * 72 / displayDPI;
 			isRelayoutingNow = true;
 			oldW = w;
 			oldH = h;
 			readerView.setZoomWithoutUpdate(1);
-			Log.v(APP, "Relayout: width="+w+", height="+h);
+			Log.v(APP, "relayout: width="+w+", height="+h);
 			relayoutDocument();
 		}
 	}
 
 	private void callFullscreen() {
+		Log.v(APP, "call fullscreen");
 		if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
 			View v = this.getWindow().getDecorView();
 			v.setSystemUiVisibility(View.GONE);
@@ -543,13 +545,9 @@ public class DocumentActivity extends FragmentActivity
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
-					BookLocation bookLoc = new BookLocation(doc, currentPage);
+					savedBookLoc = new BookLocation(doc, currentPage);
 					Log.i(APP, "relayout document");
 					doc.layout(layoutW, layoutH, LAYOUT_EM);
-					pageCount = doc.countPages();
-					currentPage = bookLoc.toPage(doc);
-					if(currentPage<0) currentPage = 0;
-					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					pageCount = 1;
 					currentPage = 0;
@@ -557,6 +555,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				evaluatePages();
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
@@ -778,6 +777,7 @@ public class DocumentActivity extends FragmentActivity
 	 * Load required document data
 	 */
 	protected void loadDocument() {
+		pageCount = 0;
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
@@ -790,10 +790,6 @@ public class DocumentActivity extends FragmentActivity
 						Log.i(APP, "layout document");
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
-					pageCount = doc.countPages();
-					currentPage = savedBookLoc.toPage(doc);
-					if(currentPage<0) currentPage = 0;
-					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -802,6 +798,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				evaluatePages();
 				progressBar.setVisibility(View.INVISIBLE);
 				titleLabel.setText(title);
 				if (isReflowable)
@@ -826,10 +823,6 @@ public class DocumentActivity extends FragmentActivity
 						Log.i(APP, "layout document");
 						doc.layout(layoutW, layoutH, LAYOUT_EM);
 					}
-					pageCount = doc.countPages();
-					currentPage = savedBookLoc.toPage(doc);
-					if(currentPage<0) currentPage = 0;
-					else if (currentPage>=pageCount) currentPage=pageCount-1;
 				} catch (Throwable x) {
 					doc = null;
 					pageCount = 1;
@@ -838,11 +831,19 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
+				evaluatePages();
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 			}
 		});
+	}
+
+	public void evaluatePages() {
+		pageCount = doc.countPages();
+		currentPage = savedBookLoc.toPage(doc);
+		if(currentPage<0) currentPage = 0;
+		else if (currentPage>=pageCount) currentPage=pageCount-1;
 	}
 
 	public String getSearchNeedle() { return searchNeedle; }
