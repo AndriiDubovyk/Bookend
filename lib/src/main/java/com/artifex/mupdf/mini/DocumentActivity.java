@@ -24,6 +24,7 @@ import android.view.DisplayCutout;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -161,16 +162,16 @@ public class DocumentActivity extends FragmentActivity
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		callFullscreen();
 		actionListener = this;
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		displayDPI = metrics.densityDpi;
-
 		setContentView(R.layout.document_activity);
-		cssManager = new CSSManager();
 
+
+
+		cssManager = new CSSManager();
 		progressBar = findViewById(R.id.progress_bar);
 		actionBar = findViewById(R.id.action_bar);
 
@@ -347,7 +348,26 @@ public class DocumentActivity extends FragmentActivity
 		readerView.setAdapter(new PageAdapter(getSupportFragmentManager(), actionListener));
 	}
 
+	private int currentCutoutMargin = 0;
+	private void processCutout() {
+		int cutoutMargin ;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && this.isInMultiWindowMode())) {
+			DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
+			if (displayCutout!=null && displayCutout.getBoundingRects().size()>0) {
+				android.graphics.Rect notchRect = displayCutout.getBoundingRects().get(0);
+				cutoutMargin = notchRect.height();
+			} else {
+				cutoutMargin = 0;
+			}
+		} else {
+			cutoutMargin = 0;
+		}
+		Log.v(APP,"notch height in pixels="+cutoutMargin);
+		if(currentCutoutMargin !=cutoutMargin) setCutoutMargin(cutoutMargin);
+	}
+
 	private void setCutoutMargin(int cutoutMargin) {
+		currentCutoutMargin = cutoutMargin;
 		if(actionBar==null) return;
 		actionBar.setPadding(
 				actionBar.getPaddingLeft(),
@@ -359,23 +379,6 @@ public class DocumentActivity extends FragmentActivity
 				cutoutMargin,
 				searchBar.getPaddingRight(),
 				searchBar.getPaddingBottom());
-	}
-
-	@Override
-	public void onAttachedToWindow() {
-		super.onAttachedToWindow();
-		int cutoutMargin = 0;
-		 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-			DisplayCutout displayCutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
-			if (displayCutout!=null && displayCutout.getBoundingRects().size()>0) {
-				android.graphics.Rect notchRect = displayCutout.getBoundingRects().get(0);
-				cutoutMargin = notchRect.height();
-			}
-		} else {
-			cutoutMargin = 0;
-		}
-		Log.v(APP,"notch height in pixels="+cutoutMargin);
-		setCutoutMargin(cutoutMargin);
 	}
 
 	private void loadPrefs() {
@@ -457,21 +460,53 @@ public class DocumentActivity extends FragmentActivity
 
 	private int oldW = 0;
 	private int oldH = 0;
+	private boolean isRelayoutingNow = false;
 	public void onPageViewSizeChanged(int w, int h) {
 		canvasW = w;
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
 		layoutH = canvasH * 72 / displayDPI;
+		Log.v(APP, "NoRelayout: width="+w+", height="+h + " canvasW="+canvasW+", canvasH="+canvasH);
 		if (!hasLoaded) {
+			processCutout();
+			callFullscreen(); // if possible
+			oldW = w;
+			oldH = h;
 			hasLoaded = true;
 			openDocument();
-		} else if(!isReflowable && oldW != w || oldH != h) {
+		} else if(isReflowable && (oldW != w || oldH != h) && !isRelayoutingNow) {
+			processCutout();
+			callFullscreen(); // if possible
+			isRelayoutingNow = true;
 			oldW = w;
 			oldH = h;
 			readerView.setZoomWithoutUpdate(1);
 			Log.v(APP, "Relayout: width="+w+", height="+h);
 			relayoutDocument();
 		}
+	}
+
+	private void callFullscreen() {
+		if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+			View v = this.getWindow().getDecorView();
+			v.setSystemUiVisibility(View.GONE);
+		} else if(Build.VERSION.SDK_INT >= 19) {
+			//for new api versions.
+			View decorView = getWindow().getDecorView();
+			int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+					| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+					| View.SYSTEM_UI_FLAG_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+			decorView.setSystemUiVisibility(uiOptions);
+		}
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if(hasFocus) callFullscreen();
 	}
 
 	public void onPageViewZoomChanged(float zoom) {
@@ -525,6 +560,7 @@ public class DocumentActivity extends FragmentActivity
 				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
+				isRelayoutingNow = false;
 			}
 		});
 	}
@@ -775,22 +811,6 @@ public class DocumentActivity extends FragmentActivity
 
 			}
 		});
-	}
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		//This is used to hide/show 'Status Bar' & 'System Bar'. Swip bar to get it as visible.
-		View decorView = getWindow().getDecorView();
-		if (hasFocus) {
-			decorView.setSystemUiVisibility(
-					View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-							| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-							| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-							| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-							| View.SYSTEM_UI_FLAG_FULLSCREEN
-							| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-		}
 	}
 
 	protected void reloadDocument() {
