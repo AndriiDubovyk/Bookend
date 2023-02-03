@@ -257,8 +257,8 @@ public class DocumentActivity extends FragmentActivity
 		searchHitPage = -1;
 		hasLoaded = false;
 
-		pageLabel = (TextView)findViewById(R.id.page_label);
-		pageSeekbar = (SeekBar)findViewById(R.id.page_seekbar);
+		pageLabel = findViewById(R.id.page_label);
+		pageSeekbar = findViewById(R.id.page_seekbar);
 		pageSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public int newProgress = -1;
 			public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
@@ -657,6 +657,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	public void updatePageNumberInfo(int newPageNumber) {
+		Log.i("mytag", "updatePageNumberInfo "+newPageNumber);
 		currentPage = newPageNumber;
 		pageLabel.setText((currentPage+1) + " / " + pageCount);
 		pageSeekbar.setMax(pageCount - 1);
@@ -939,6 +940,7 @@ public class DocumentActivity extends FragmentActivity
 
 	public void gotoPage(int p) {
 		if (p >= 0 && p < pageCount && p != currentPage) {
+			if(p==0) updatePageNumberInfo(0); // view pager consider 0 as default so we need update
 			history.push(new BookLocation(doc, currentPage));
 			currentPage = p;
 			readerView.setCurrentItem(p, false);
