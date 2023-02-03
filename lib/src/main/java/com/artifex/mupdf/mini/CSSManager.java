@@ -6,7 +6,8 @@ import java.util.Map;
 public class CSSManager {
 
     public int fontSize = 20; // 1-80
-    public String textAlign = "justify"; // justify/left
+    public String textAlign = "Justify";
+    public String fontFamily = "Charis SIL";
 
     private final static String BASE_CSS =
             "a{color:#06C;text-decoration:underline}\n" +
@@ -126,7 +127,8 @@ public class CSSManager {
     public String getCSS() {
         return BASE_CSS +
                 "body{font-size: "+getFontSizePercent(fontSize)+"% !important;}\n"+
-                "p{text-align:"+textAlign+";}\n";
+                "body{font-family: "+fontFamily+" !important;}\n"+
+                "p{text-align:"+textAlign.toLowerCase()+";}\n";
     }
 
     private static int getFontSizePercent(int value) {

@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#ffffff">
 
     <LinearLayout
@@ -10,29 +11,68 @@
         android:background="#ffffff"
         android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="settingssettingssettingssettingssettingssettingssettingssettingssettingssettings"
-            android:textColor="#000000"
-            android:textSize="60sp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="settingssettingssettingssettingssettingssettingssettingssettingssettingssettings"
-            android:textColor="#000000"
-            android:textSize="60sp"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/text_align_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="TEXT ALIGN"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <Spinner
+                android:id="@+id/text_align_spinner"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:popupBackground="#E3E3E3"
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="settingssettingssettingssettingssettingssettingssettingssettingssettingssettings"
-            android:textColor="#000000"
-            android:textSize="60sp"/>
+                android:gravity="center"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/font_face_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="FONT FACE"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <Spinner
+                android:focusable="false"
+                android:id="@+id/font_face_spinner"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:popupBackground="#E3E3E3"
+                android:gravity="center"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+
+
 
     </LinearLayout>
 
