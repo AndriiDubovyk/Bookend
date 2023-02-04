@@ -5,9 +5,9 @@
     android:layout_height="wrap_content"
     android:textSize="18.5sp"
     android:gravity="left"
-    android:textColor="#000000"
+    android:textColor="@color/black"
     android:ellipsize="marquee"
-    android:background="@drawable/rect_button"
+    android:background="@drawable/small_button"
     android:paddingVertical="5dp"
     android:paddingHorizontal="10dp"
     android:singleLine="true" />

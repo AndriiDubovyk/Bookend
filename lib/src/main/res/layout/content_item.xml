@@ -19,7 +19,7 @@
             android:paddingVertical="10dp"
             android:paddingLeft="6dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/main_ui_text_color"
+            android:textColor="@color/white"
             android:textSize="15.5sp"
             android:ellipsize="end"
             android:text=""/>
@@ -27,7 +27,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/expand_button"
             android:layout_width="34dp"
             android:layout_height="match_parent"
-            android:background="@drawable/rect_button"
             android:clickable="true"
             >
 
@@ -38,8 +37,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                android:src="@drawable/ic_chevron_right_white_24dp"
-                />
+                android:background="@drawable/small_button"
+                android:src="@drawable/ic_chevron_right_white_24dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -49,7 +48,7 @@
             android:paddingVertical="10dp"
             android:paddingHorizontal="1dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/main_ui_text_color"
+            android:textColor="@color/light_yellow"
             android:textSize="15.5sp"
             android:layout_gravity="center_vertical"
             android:gravity="center"

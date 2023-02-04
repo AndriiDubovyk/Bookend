@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="FONT FACE"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -36,8 +36,9 @@
                 android:layout_width="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:popupBackground="#E3E3E3"
+                android:popupBackground="@color/light_red"
                 android:gravity="center"
+                android:backgroundTint="@color/white"
                 android:spinnerMode="dropdown"/>
         </LinearLayout>
 
@@ -57,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="FONT SIZE"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -69,7 +70,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:layout_marginBottom="-16dp"
-                android:textColor="@color/main_ui_text_color"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 />
 
@@ -90,8 +91,8 @@
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@null"
-                    android:thumb="@drawable/seek_thumb"
-                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb_white"
+                    android:progressDrawable="@drawable/seek_line_white"
                     android:max="10"
                     />
                 <ImageButton
@@ -121,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="TEXT ALIGN"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -130,8 +131,8 @@
                 android:layout_width="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:popupBackground="#E3E3E3"
-
+                android:popupBackground="@color/light_red"
+                android:backgroundTint="@color/white"
                 android:gravity="center"
                 android:spinnerMode="dropdown"/>
         </LinearLayout>
@@ -151,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="TOP MARGIN"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -162,7 +163,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:layout_marginBottom="-16dp"
-                android:textColor="@color/main_ui_text_color"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 />
 
@@ -183,8 +184,8 @@
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@null"
-                    android:thumb="@drawable/seek_thumb"
-                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb_white"
+                    android:progressDrawable="@drawable/seek_line_white"
                     android:max="10"
                     />
                 <ImageButton
@@ -212,7 +213,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="BOTTOM MARGIN"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -223,7 +224,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:layout_marginBottom="-16dp"
-                android:textColor="@color/main_ui_text_color"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 />
 
@@ -244,8 +245,8 @@
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@null"
-                    android:thumb="@drawable/seek_thumb"
-                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb_white"
+                    android:progressDrawable="@drawable/seek_line_white"
                     android:max="10"
                     />
                 <ImageButton
@@ -273,7 +274,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="LEFT MARGIN"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -284,7 +285,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:layout_marginBottom="-16dp"
-                android:textColor="@color/main_ui_text_color"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 />
 
@@ -305,8 +306,8 @@
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@null"
-                    android:thumb="@drawable/seek_thumb"
-                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb_white"
+                    android:progressDrawable="@drawable/seek_line_white"
                     android:max="10"
                     />
                 <ImageButton
@@ -334,7 +335,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="RIGHT MARGIN"
-                android:textColor="#CFCFCF"
+                android:textColor="@color/light_yellow"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
@@ -345,7 +346,7 @@
                 android:gravity="center"
                 android:text="10"
                 android:layout_marginBottom="-16dp"
-                android:textColor="@color/main_ui_text_color"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 />
 
@@ -366,8 +367,8 @@
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:background="@null"
-                    android:thumb="@drawable/seek_thumb"
-                    android:progressDrawable="@drawable/seek_line"
+                    android:thumb="@drawable/seek_thumb_white"
+                    android:progressDrawable="@drawable/seek_line_white"
                     android:max="10"
                     />
                 <ImageButton
