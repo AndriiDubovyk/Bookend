@@ -13,9 +13,13 @@ public class PageFragment extends Fragment {
     private ViewGroup root;
     private PageView pageView;
     private int pageNumber;
-    private final DocumentActivity actionListener;
+    private DocumentActivity actionListener;
 
-    public PageFragment(DocumentActivity da) {
+    public PageFragment() {
+
+    }
+
+    public void setActionListener(DocumentActivity da) {
         actionListener = da;
     }
 

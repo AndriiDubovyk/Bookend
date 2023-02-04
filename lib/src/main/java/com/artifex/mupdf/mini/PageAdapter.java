@@ -68,7 +68,8 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         Bundle arguments = new Bundle();
         arguments.putInt(PageFragment.PAGE_NUMBER, position);
 
-        PageFragment fragment = new PageFragment(actionListener);
+        PageFragment fragment = new PageFragment();
+        fragment.setActionListener(actionListener);
         fragment.setArguments(arguments);
         cache.put(position, fragment);
         return fragment;
