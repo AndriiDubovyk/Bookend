@@ -1,9 +1,11 @@
 package com.artifex.mupdf.mini;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListPopupWindow;
@@ -24,6 +26,10 @@ public class SettingsFragment extends Fragment {
     private static final int MARGIN_MAX = 30;
     private static final int MAX_FONT = 79;
 
+    private Spinner text_align_dropdown;
+
+    private DocumentActivity actionListener;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -32,6 +38,20 @@ public class SettingsFragment extends Fragment {
         initFontSettings(rootView);
         initMarginSettings(rootView);
         return rootView;
+    }
+
+    public void setActionListener(DocumentActivity da) {
+        actionListener = da;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            if(actionListener==null) actionListener = (DocumentActivity) activity;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public void initFontSettings(View rootView) {
@@ -70,11 +90,24 @@ public class SettingsFragment extends Fragment {
     }
 
     public void initAlignSettings(View rootView) {
-        Spinner text_align_dropdown = rootView.findViewById(R.id.text_align_spinner);
+        text_align_dropdown = rootView.findViewById(R.id.text_align_spinner);
         avoidSpinnerDropdownFocus(text_align_dropdown);
         ArrayAdapter<String> text_align_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, TEXT_ALIGN_OPT);
         text_align_adapter.setDropDownViewResource(R.layout.spinner_item);
         text_align_dropdown.setAdapter(text_align_adapter);
+        text_align_dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String newValue = TEXT_ALIGN_OPT[position];
+                if(actionListener.cssManager.textAlign!=newValue)
+                    actionListener.setTextAlignment(TEXT_ALIGN_OPT[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     public void initMarginSettings(View rootView) {
@@ -99,6 +132,15 @@ public class SettingsFragment extends Fragment {
                 R.id.minus_right_margin_btn,
                 R.id.plus_right_margin_btn);
 
+    }
+
+    public void updateValues() {
+        for(int i = 0; i<TEXT_ALIGN_OPT.length; i++) {
+            if(TEXT_ALIGN_OPT[i].equals(actionListener.cssManager.textAlign)) {
+                text_align_dropdown.setSelection(i);
+                break;
+            }
+        }
     }
 
     public void initMarginSettingsItem(View rootView, int marginTextId, int marginSeekbarId, int minusBtnId, int plusBtnId) {

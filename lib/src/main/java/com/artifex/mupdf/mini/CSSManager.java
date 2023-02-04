@@ -1,13 +1,15 @@
 package com.artifex.mupdf.mini;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class CSSManager {
 
+    public String fontFace = "Charis SIL";
     public int fontSize = 20; // 1-80
     public String textAlign = "Justify";
-    public String fontFamily = "Charis SIL";
+    public int topMargin = 10;
+    public int botMargin = 10;
+    public int leftMargin = 10;
+    public int rightMargin = 10;
+
 
     private final static String BASE_CSS =
             "a{color:#06C;text-decoration:underline}\n" +
@@ -127,8 +129,8 @@ public class CSSManager {
     public String getCSS() {
         return BASE_CSS +
                 "body{font-size: "+getFontSizePercent(fontSize)+"% !important;}\n"+
-                "body{font-family: "+fontFamily+" !important;}\n"+
-                "p{text-align:"+textAlign.toLowerCase()+";}\n";
+                "body{font-family: "+ fontFace +" !important;}\n"+
+                "p{text-align:"+textAlign.toLowerCase()+" !important;}\n";
     }
 
     private static int getFontSizePercent(int value) {

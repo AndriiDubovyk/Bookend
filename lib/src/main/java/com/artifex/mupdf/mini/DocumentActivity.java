@@ -23,8 +23,6 @@ import android.util.Log;
 import android.view.DisplayCutout;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -71,6 +69,16 @@ public class DocumentActivity extends FragmentActivity
 	private static final String CURRENT_CHAPTER_PROGRESS = "CURRENT_CHAPTER_PROGRESS";
 	private BookLocation savedBookLoc;
 
+	// Settings save
+	private static final String FONT_FACE = "FONT_FACE";
+	private static final String FONT_SIZE = "FONT_SIZE";
+	private static final String TEXT_ALIGN = "TEXT_ALIGN";
+	private static final String TOP_MARGIN = "TOP_MARGIN";
+	private static final String BOT_MARGIN = "BOT_MARGIN";
+	private static final String LEFT_MARGIN = "LEFT_MARGIN";
+	private static final String RIGHT_MARGIN = "RIGHT_MARGIN";
+
+
 	private static final String DEFAULT_CHAPTER_NAME = "Section";
 	protected String mimetype;
 	protected SeekableInputStream stream;
@@ -105,7 +113,7 @@ public class DocumentActivity extends FragmentActivity
 	protected TextView chapterPageLabel;
 	protected ProgressBar progressBar;
 
-	private CSSManager cssManager;
+	protected CSSManager cssManager;
 	protected int pageCount;
 	protected int currentPage;
 	protected int searchHitPage;
@@ -164,12 +172,11 @@ public class DocumentActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		callFullscreen();
 		actionListener = this;
-		contentFragment.setActionListener(actionListener);
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		displayDPI = metrics.densityDpi;
 		setContentView(R.layout.document_activity);
-		initContentFragment();
+		initFragments();
 
 
 		cssManager = new CSSManager();
@@ -384,13 +391,25 @@ public class DocumentActivity extends FragmentActivity
 
 	private void loadPrefs() {
 		prefs = getPreferences(Context.MODE_PRIVATE);
-		cssManager.fontSize = prefs.getInt("fontSize", cssManager.fontSize);
+
 		savedBookLoc = new BookLocation(prefs.getInt(key+ CURRENT_CHAPTER, 0), prefs.getFloat(key+CURRENT_CHAPTER_PROGRESS, 0));
+
+		cssManager.fontFace = prefs.getString(FONT_FACE, cssManager.fontFace);
+		cssManager.fontSize = prefs.getInt(FONT_SIZE, cssManager.fontSize);
+		cssManager.textAlign = prefs.getString(TEXT_ALIGN, cssManager.textAlign);
+		cssManager.topMargin = prefs.getInt(TOP_MARGIN, cssManager.topMargin);
+		cssManager.botMargin = prefs.getInt(BOT_MARGIN, cssManager.botMargin);
+		cssManager.leftMargin = prefs.getInt(LEFT_MARGIN, cssManager.leftMargin);
+		cssManager.rightMargin = prefs.getInt(RIGHT_MARGIN, cssManager.rightMargin);
 	}
 
-	public void initContentFragment() {
+	public void initFragments() {
+		contentFragment.setActionListener(actionListener);
+		settingsFragment.setActionListener(actionListener);
 		FragmentManager fm = getSupportFragmentManager();
 		fm.beginTransaction().add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).hide(contentFragment).commit();
+		fm.beginTransaction().add(R.id.side_menu_container, settingsFragment, FRAGMENT_SETTINGS_TAG).hide(settingsFragment).commit();
+
 
 	}
 
@@ -415,6 +434,7 @@ public class DocumentActivity extends FragmentActivity
 			case SETTINGS:
 				if(currentFragmentState == FragmentsState.SETTINGS) return;
 				currentFragmentState = FragmentsState.SETTINGS;
+				settingsFragment.updateValues();
 				if(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)!=null) {
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)).commit();
 				} else {
@@ -562,12 +582,17 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				evaluatePages();
-				if(currentFragmentState==FragmentsState.CONTENT) manageFragmentTransaction(FragmentsState.NONE);
+				manageFragmentTransaction(FragmentsState.NONE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 				isRelayoutingNow = false;
 			}
 		});
+	}
+
+	public void setTextAlignment(String value) {
+		cssManager.textAlign = value;
+		reopenDocument();
 	}
 
 	/**
@@ -645,6 +670,15 @@ public class DocumentActivity extends FragmentActivity
 		BookLocation bl = new BookLocation(doc, currentPage);
 		editor.putInt(key+ CURRENT_CHAPTER, bl.chapter);
 		editor.putFloat(key+CURRENT_CHAPTER_PROGRESS, bl.chapterProgress);
+
+		editor.putString(FONT_FACE, cssManager.fontFace);
+		editor.putInt(FONT_SIZE, cssManager.fontSize);
+		editor.putString(TEXT_ALIGN, cssManager.textAlign);
+		editor.putInt(TOP_MARGIN, cssManager.topMargin);
+		editor.putInt(BOT_MARGIN, cssManager.botMargin);
+		editor.putInt(LEFT_MARGIN, cssManager.leftMargin);
+		editor.putInt(RIGHT_MARGIN, cssManager.rightMargin);
+
 		editor.apply();
 	}
 
