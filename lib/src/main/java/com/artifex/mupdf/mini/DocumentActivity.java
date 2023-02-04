@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.DisplayCutout;
 import android.view.KeyEvent;
 import android.view.View;
@@ -176,19 +178,6 @@ public class DocumentActivity extends FragmentActivity
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		displayDPI = metrics.densityDpi;
 		setContentView(R.layout.document_activity);
-		initFragments();
-
-
-		cssManager = new CSSManager();
-		progressBar = findViewById(R.id.progress_bar);
-		actionBar = findViewById(R.id.action_bar);
-
-		searchBar = findViewById(R.id.search_bar);
-		navigationBar = findViewById(R.id.navigation_bar);
-
-
-
-		currentBar = actionBar;
 
 		Uri uri = getIntent().getData();
 		mimetype = getIntent().getType();
@@ -204,6 +193,23 @@ public class DocumentActivity extends FragmentActivity
 
 		Log.i(APP, "OPEN URI " + uri.toString());
 		Log.i(APP, "  MAGIC (Intent) " + mimetype);
+
+		cssManager = new CSSManager();
+		loadPrefs();
+		initFragments();
+
+
+		progressBar = findViewById(R.id.progress_bar);
+		actionBar = findViewById(R.id.action_bar);
+
+		searchBar = findViewById(R.id.search_bar);
+		navigationBar = findViewById(R.id.navigation_bar);
+
+
+
+		currentBar = actionBar;
+
+
 
 		title = "";
 		long size = -1;
@@ -260,8 +266,7 @@ public class DocumentActivity extends FragmentActivity
 		worker = new Worker(this);
 		worker.start();
 
-		loadPrefs();
-		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
+
 		searchHitPage = -1;
 		hasLoaded = false;
 
@@ -392,7 +397,7 @@ public class DocumentActivity extends FragmentActivity
 	private void loadPrefs() {
 		prefs = getPreferences(Context.MODE_PRIVATE);
 
-		savedBookLoc = new BookLocation(prefs.getInt(key+ CURRENT_CHAPTER, 0), prefs.getFloat(key+CURRENT_CHAPTER_PROGRESS, 0));
+		savedBookLoc = new BookLocation(prefs.getInt(key+CURRENT_CHAPTER, 0), prefs.getFloat(key+CURRENT_CHAPTER_PROGRESS, 0));
 
 		cssManager.fontFace = prefs.getString(FONT_FACE, cssManager.fontFace);
 		cssManager.fontSize = prefs.getInt(FONT_SIZE, cssManager.fontSize);
@@ -434,7 +439,6 @@ public class DocumentActivity extends FragmentActivity
 			case SETTINGS:
 				if(currentFragmentState == FragmentsState.SETTINGS) return;
 				currentFragmentState = FragmentsState.SETTINGS;
-				settingsFragment.updateValues();
 				if(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)!=null) {
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_SETTINGS_TAG)).commit();
 				} else {
@@ -499,7 +503,7 @@ public class DocumentActivity extends FragmentActivity
 			oldH = h;
 			hasLoaded = true;
 			openDocument();
-		} else if(isReflowable && (oldW != w || oldH != h) && !isRelayoutingNow) {
+		} else if(isReflowable && (oldW != w || oldH != h)  /*&&!isRelayoutingNow*/) {
 			canvasW = w;
 			canvasH = h;
 			layoutW = canvasW * 72 / displayDPI;
@@ -547,6 +551,7 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	protected void openDocument() {
+		com.artifex.mupdf.fitz.Context.setUserCSS(cssManager.getCSS());
 		progressBar.setVisibility(View.VISIBLE);
 		worker.add(new Worker.Task() {
 			boolean needsPassword;
@@ -582,7 +587,6 @@ public class DocumentActivity extends FragmentActivity
 			}
 			public void run() {
 				evaluatePages();
-				manageFragmentTransaction(FragmentsState.NONE);
 				loadOutline();
 				readerView.setCurrentItem(currentPage, false); // automatically notify adapter
 				isRelayoutingNow = false;
@@ -590,10 +594,55 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
-	public void setTextAlignment(String value) {
-		cssManager.textAlign = value;
-		reopenDocument();
+	public void setFontFace(String value) {
+		if(!value.equals(cssManager.fontFace)) {
+			Log.v(APP,"new fontFace value "+value);
+			cssManager.fontFace = value;
+			reopenDocument();
+		}
 	}
+	public void setFontSize(int value) {
+		if(value!=cssManager.fontSize) {
+			Log.v(APP,"new fontSize value "+value);
+			cssManager.fontSize = value;
+			reopenDocument();
+		}
+	}
+	public void setTextAlignment(String value) {
+		if(!value.equals(cssManager.textAlign)) {
+			Log.v(APP,"new textAlign value "+value);
+			cssManager.textAlign = value;
+			reopenDocument();
+		}
+	}
+	public void setTopMargin(int value) {
+		if(value!=cssManager.topMargin) {
+			Log.v(APP,"new topMargin value "+value);
+			reopenDocument();
+		}
+	}
+	public void setBotMargin(int value) {
+		if(value!=cssManager.botMargin) {
+			Log.v(APP,"new botMargin value "+value);
+			cssManager.botMargin = value;
+			reopenDocument();
+		}
+	}
+	public void setLeftMargin(int value) {
+		if(value!=cssManager.leftMargin) {
+			Log.v(APP,"new leftMargin value "+value);
+			cssManager.leftMargin = value;
+			reopenDocument();
+		}
+	}
+	public void setRightMargin(int value) {
+		if(value!=cssManager.rightMargin) {
+			Log.v(APP,"new rightMargin value "+value);
+			cssManager.rightMargin = value;
+			reopenDocument();
+		}
+	}
+
 
 	/**
 	 * Relayout document after we change css
@@ -666,9 +715,8 @@ public class DocumentActivity extends FragmentActivity
 
 	private void savePrefs() {
 		SharedPreferences.Editor editor = prefs.edit();
-		editor.putInt("fontSize", cssManager.fontSize);
 		BookLocation bl = new BookLocation(doc, currentPage);
-		editor.putInt(key+ CURRENT_CHAPTER, bl.chapter);
+		editor.putInt(key+CURRENT_CHAPTER, bl.chapter);
 		editor.putFloat(key+CURRENT_CHAPTER_PROGRESS, bl.chapterProgress);
 
 		editor.putString(FONT_FACE, cssManager.fontFace);

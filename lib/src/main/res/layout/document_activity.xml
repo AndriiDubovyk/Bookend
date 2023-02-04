@@ -14,7 +14,7 @@
 		android:id="@+id/progress_bar"
 		android:visibility="invisible"
 		android:indeterminateTintMode="src_in"
-		android:indeterminateTint="@color/dark_yellow"
+		android:indeterminateTint="@color/dark_red"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		app:layout_constraintLeft_toLeftOf="parent"

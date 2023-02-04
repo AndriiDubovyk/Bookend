@@ -128,9 +128,10 @@ public class CSSManager {
 
     public String getCSS() {
         return BASE_CSS +
-                "body{font-size: "+getFontSizePercent(fontSize)+"% !important;}\n"+
-                "body{font-family: "+ fontFace +" !important;}\n"+
-                "p{text-align:"+textAlign.toLowerCase()+" !important;}\n";
+                "body{font-size: "+getFontSizePercent(fontSize)+"% !important;}"+
+                "body{font-family: "+ fontFace +" !important;}"+
+                "body{margin: "+topMargin+"% "+rightMargin+"% "+botMargin+"% "+leftMargin+"% !important;}"+
+                "p{text-align:"+textAlign.toLowerCase()+" !important;}";
     }
 
     private static int getFontSizePercent(int value) {
