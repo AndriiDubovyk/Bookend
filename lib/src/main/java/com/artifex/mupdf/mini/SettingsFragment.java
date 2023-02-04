@@ -85,7 +85,7 @@ public class SettingsFragment extends Fragment {
             public void onStartTrackingTouch(SeekBar seekbar) {}
             public void onStopTrackingTouch(SeekBar seekbar) {actionListener.setFontSize(newProgress);}
         });
-        fontSizeText.setText(""+fonSizeSeekBar.getProgress());
+        fontSizeText.setText(""+(fonSizeSeekBar.getProgress()+1));
         ImageButton minusFontSizeBtn = rootView.findViewById(R.id.minus_font_size_btn);
         minusFontSizeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
