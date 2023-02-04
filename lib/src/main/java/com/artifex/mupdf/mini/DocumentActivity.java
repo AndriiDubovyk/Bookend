@@ -164,11 +164,12 @@ public class DocumentActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		callFullscreen();
 		actionListener = this;
+		contentFragment.setActionListener(actionListener);
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		displayDPI = metrics.densityDpi;
 		setContentView(R.layout.document_activity);
-
+		initContentFragment();
 
 
 		cssManager = new CSSManager();
@@ -387,6 +388,12 @@ public class DocumentActivity extends FragmentActivity
 		savedBookLoc = new BookLocation(prefs.getInt(key+ CURRENT_CHAPTER, 0), prefs.getFloat(key+CURRENT_CHAPTER_PROGRESS, 0));
 	}
 
+	public void initContentFragment() {
+		FragmentManager fm = getSupportFragmentManager();
+		fm.beginTransaction().add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).hide(contentFragment).commit();
+
+	}
+
 	@SuppressLint("ResourceType")
 	public void manageFragmentTransaction(FragmentsState fs) {
 		FragmentManager fm = getSupportFragmentManager();
@@ -394,8 +401,8 @@ public class DocumentActivity extends FragmentActivity
 			case CONTENT:
 				if(currentFragmentState == FragmentsState.CONTENT) return;
 				currentFragmentState = FragmentsState.CONTENT;
+				contentFragment.updateItems();
 				if(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)!=null) {
-					contentFragment.updateItems();
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).show(fm.findFragmentByTag(FRAGMENT_CONTENT_TAG)).commit();
 				} else {
 					fm.beginTransaction().setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left).add(R.id.side_menu_container, contentFragment, FRAGMENT_CONTENT_TAG).commit();

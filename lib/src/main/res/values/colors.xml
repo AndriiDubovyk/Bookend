@@ -2,5 +2,5 @@
 <resources>
     <color name="main_ui_color">#907838</color>
     <color name="main_ui_text_color">#FFFFFF</color>
-    <color name="content_selection_color">#4D907838</color>
+    <color name="content_selection_color">#A87E0A</color>
 </resources>

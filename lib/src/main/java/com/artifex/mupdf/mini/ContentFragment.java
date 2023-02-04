@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.ListFragment;
 
 import java.util.ArrayList;
@@ -62,11 +65,9 @@ public class ContentFragment extends ListFragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        displayedItems = new ArrayList<>(actionListener.getContentItems());
-        adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
+        displayedItems = new ArrayList<>();
+        adapter = new ContentListAdapter(getActivity(), R.layout.content_item, displayedItems);
         setListAdapter(adapter);
-        ArrayList<Integer> indices = getContentItemIndicesByPage(displayedItems, actionListener.currentPage);
-        processExpansionWithIndices(indices);
     }
 
     @Override
@@ -123,11 +124,15 @@ public class ContentFragment extends ListFragment {
         }
     }
 
+    public void setActionListener(DocumentActivity da) {
+        actionListener = da;
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            actionListener = (DocumentActivity) activity;
+            if(actionListener==null) actionListener = (DocumentActivity) activity;
         } catch (Exception e) {
             throw e;
         }
@@ -190,7 +195,7 @@ public class ContentFragment extends ListFragment {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
             if(position==selectedItem)
-                itemView.setBackgroundColor(getResources().getColor(R.color.content_selection_color));
+                itemView.setBackground(ContextCompat.getDrawable(context, R.drawable.content_selected_item_background));
             ContentItem item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             if(item.down.size()>0) titleTextView.setTypeface(titleTextView.getTypeface(), Typeface.BOLD);
