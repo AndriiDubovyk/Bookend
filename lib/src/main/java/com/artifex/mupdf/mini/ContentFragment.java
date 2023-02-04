@@ -2,8 +2,10 @@ package com.artifex.mupdf.mini;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +13,11 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.ListFragment;
 
@@ -66,7 +70,7 @@ public class ContentFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         displayedItems = new ArrayList<>();
-        adapter = new ContentListAdapter(getActivity(), R.layout.content_item, displayedItems);
+        adapter = new ContentListAdapter(getActivity(), android.R.layout.simple_list_item_1, displayedItems);
         setListAdapter(adapter);
     }
 
@@ -194,13 +198,22 @@ public class ContentFragment extends ListFragment {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View itemView = inflater.inflate(R.layout.content_item, parent, false);
-            if(position==selectedItem)
-                itemView.setBackground(ContextCompat.getDrawable(context, R.drawable.content_selected_item_background));
+
             ContentItem item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
             if(item.down.size()>0) titleTextView.setTypeface(titleTextView.getTypeface(), Typeface.BOLD);
-            int leftPadding = titleTextView.getPaddingLeft()/2 + titleTextView.getPaddingLeft() * (item.level < 4 ? item.level : 4);
-            titleTextView.setPadding(leftPadding, titleTextView.getPaddingTop(), titleTextView.getPaddingRight(), titleTextView.getPaddingBottom());
+
+            LinearLayout wrapper = itemView.findViewById(R.id.wrapper);
+            if(position==selectedItem)
+                wrapper.setBackground(ContextCompat.getDrawable(context, R.drawable.content_selected_item_background));
+            int leftMargin = 16 * (item.level < 4 ? item.level : 4);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(dpToPx(leftMargin), 0, 0, 0);
+            wrapper.setLayoutParams(params);
+
             titleTextView.setText(item.title);
             TextView pageTextView = itemView.findViewById(R.id.page_number);
             pageTextView.setText(""+(item.page+1));
@@ -228,4 +241,14 @@ public class ContentFragment extends ListFragment {
             adapter.notifyDataSetChanged();
         }
     };
+
+    private int dpToPx(int dp) {
+        Resources r = getResources();
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                r.getDisplayMetrics()
+        );
+        return px;
+    }
 }

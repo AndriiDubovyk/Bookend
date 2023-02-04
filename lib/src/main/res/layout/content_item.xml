@@ -1,56 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:background="@drawable/content_item_background"
     android:descendantFocusability="blocksDescendants">
-    <TextView
-        android:id="@+id/contentTitle"
-        android:layout_width="0dp"
-        android:layout_weight="74"
-        android:paddingVertical="10dp"
-        android:paddingLeft="14dp"
+
+    <LinearLayout
+        android:id="@+id/wrapper"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/main_ui_text_color"
-        android:textSize="15.5sp"
-        android:ellipsize="end"
-        android:text=""/>
+        android:background = "@drawable/content_item_background"
+        android:orientation="horizontal">
 
-    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/expand_button"
-        android:layout_width="0dp"
-        android:layout_weight="10"
-        android:layout_height="match_parent"
-        android:background="@drawable/rect_button"
-        android:clickable="true"
-        >
-
-        <ImageView android:id="@+id/expand_icon"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/contentTitle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:paddingVertical="10dp"
+            android:paddingLeft="6dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:src="@drawable/ic_chevron_right_white_24dp"
-            />
+            android:textColor="@color/main_ui_text_color"
+            android:textSize="15.5sp"
+            android:ellipsize="end"
+            android:text=""/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/expand_button"
+            android:layout_width="34dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/rect_button"
+            android:clickable="true"
+            >
 
-    <TextView
-        android:id="@+id/page_number"
-        android:layout_width="0dp"
-        android:layout_weight="16"
-        android:paddingVertical="10dp"
-        android:paddingHorizontal="2dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/main_ui_text_color"
-        android:textSize="15.5sp"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:text="2"/>
+            <ImageView android:id="@+id/expand_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:src="@drawable/ic_chevron_right_white_24dp"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/page_number"
+            android:layout_width="55dp"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="1dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/main_ui_text_color"
+            android:textSize="15.5sp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:text="2"/>
+
+    </LinearLayout>
 
 
-</LinearLayout>
+
+</RelativeLayout>

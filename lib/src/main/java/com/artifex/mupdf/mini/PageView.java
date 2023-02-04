@@ -179,8 +179,6 @@ public class PageView extends View implements
 	public void onSizeChanged(int w, int h, int ow, int oh) {
 		canvasW = w;
 		canvasH = h;
-		if (actionListener != null && isActivePage())
-			actionListener.onPageViewSizeChanged(w, h);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
