@@ -99,7 +99,7 @@ public class SettingsFragment extends Fragment {
         plusFontSizeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(fonSizeSeekBar.getProgress()<MARGIN_MAX)
+                if(fonSizeSeekBar.getProgress()<MAX_FONT)
                     fonSizeSeekBar.setProgress(fonSizeSeekBar.getProgress()+1);
                 actionListener.setFontSize(fonSizeSeekBar.getProgress());
             }
