@@ -466,14 +466,13 @@ public class DocumentActivity extends FragmentActivity
 		canvasH = h;
 		layoutW = canvasW * 72 / displayDPI;
 		layoutH = canvasH * 72 / displayDPI;
+		processCutout();
 		if (!hasLoaded) {
-			processCutout();
 			oldW = w;
 			oldH = h;
 			hasLoaded = true;
 			openDocument();
 		} else if(isReflowable && (oldW != w || oldH != h) && !isRelayoutingNow) {
-			processCutout();
 			canvasW = w;
 			canvasH = h;
 			layoutW = canvasW * 72 / displayDPI;
