@@ -1,16 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#ffffff">
+    android:background="@android:color/transparent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#ffffff"
         android:orientation="vertical" >
 
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/font_face_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="FONT FACE"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <Spinner
+                android:focusable="false"
+                android:id="@+id/font_face_spinner"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:popupBackground="#E3E3E3"
+                android:gravity="center"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/font_size_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="FONT SIZE"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+
+            <TextView
+                android:id="@+id/font_size_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="10"
+                android:layout_marginBottom="-16dp"
+                android:textColor="@color/main_ui_text_color"
+                android:textSize="16sp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <ImageButton
+                    android:id="@+id/minus_font_size_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_left_white_24dp"
+                    android:contentDescription="minus" />
+                <SeekBar android:id="@+id/font_size_seekbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:thumb="@drawable/seek_thumb"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:max="10"
+                    />
+                <ImageButton
+                    android:id="@+id/plus_font_size_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_right_white_24dp"
+                    android:contentDescription="plus" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
@@ -46,7 +140,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
             android:paddingVertical="2dp"
-            android:id="@+id/font_face_item"
+            android:id="@+id/top_margin_item"
             android:background="@drawable/settings_item"
             android:layout_marginHorizontal="12dp"
             android:layout_marginVertical="2dp"
@@ -56,20 +150,234 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="FONT FACE"
+                android:text="TOP MARGIN"
                 android:textColor="#CFCFCF"
                 android:textStyle="bold"
                 android:textSize="12sp"
                 />
-            <Spinner
-                android:focusable="false"
-                android:id="@+id/font_face_spinner"
+            <TextView
+                android:id="@+id/top_margin_text"
                 android:layout_width="match_parent"
-                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:popupBackground="#E3E3E3"
                 android:gravity="center"
-                android:spinnerMode="dropdown"/>
+                android:text="10"
+                android:layout_marginBottom="-16dp"
+                android:textColor="@color/main_ui_text_color"
+                android:textSize="16sp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <ImageButton
+                    android:id="@+id/minus_top_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_left_white_24dp"
+                    android:contentDescription="minus" />
+                <SeekBar android:id="@+id/top_margin_seekbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:thumb="@drawable/seek_thumb"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:max="10"
+                    />
+                <ImageButton
+                    android:id="@+id/plus_top_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_right_white_24dp"
+                    android:contentDescription="plus" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/bot_margin_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="BOTTOM MARGIN"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:id="@+id/bot_margin_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="10"
+                android:layout_marginBottom="-16dp"
+                android:textColor="@color/main_ui_text_color"
+                android:textSize="16sp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <ImageButton
+                    android:id="@+id/minus_bot_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_left_white_24dp"
+                    android:contentDescription="minus" />
+                <SeekBar android:id="@+id/bot_margin_seekbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:thumb="@drawable/seek_thumb"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:max="10"
+                    />
+                <ImageButton
+                    android:id="@+id/plus_bot_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_right_white_24dp"
+                    android:contentDescription="plus" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/left_margin_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="LEFT MARGIN"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:id="@+id/left_margin_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="10"
+                android:layout_marginBottom="-16dp"
+                android:textColor="@color/main_ui_text_color"
+                android:textSize="16sp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <ImageButton
+                    android:id="@+id/minus_left_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_left_white_24dp"
+                    android:contentDescription="minus" />
+                <SeekBar android:id="@+id/left_margin_seekbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:thumb="@drawable/seek_thumb"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:max="10"
+                    />
+                <ImageButton
+                    android:id="@+id/plus_left_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_right_white_24dp"
+                    android:contentDescription="plus" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/right_margin_item"
+            android:background="@drawable/settings_item"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="RIGHT MARGIN"
+                android:textColor="#CFCFCF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:id="@+id/right_margin_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="10"
+                android:layout_marginBottom="-16dp"
+                android:textColor="@color/main_ui_text_color"
+                android:textSize="16sp"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <ImageButton
+                    android:id="@+id/minus_right_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_left_white_24dp"
+                    android:contentDescription="minus" />
+                <SeekBar android:id="@+id/right_margin_seekbar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:thumb="@drawable/seek_thumb"
+                    android:progressDrawable="@drawable/seek_line"
+                    android:max="10"
+                    />
+                <ImageButton
+                    android:id="@+id/plus_right_margin_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button"
+                    android:src="@drawable/ic_chevron_right_white_24dp"
+                    android:contentDescription="plus" />
+            </LinearLayout>
         </LinearLayout>
 
 
