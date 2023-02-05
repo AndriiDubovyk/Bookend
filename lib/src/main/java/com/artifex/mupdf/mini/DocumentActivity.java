@@ -112,6 +112,7 @@ public class DocumentActivity extends FragmentActivity
 	protected TextView chapterLabel;
 	protected TextView chapterPageLabel;
 	protected ProgressBar progressBar;
+	protected View pageSeparator;
 
 	protected SettingsManager settingsManager;
 	protected int pageCount;
@@ -197,6 +198,8 @@ public class DocumentActivity extends FragmentActivity
 		initFragments();
 
 
+		pageSeparator = findViewById(R.id.page_separator);
+		pageSeparator.setVisibility(View.GONE);
 		progressBar = findViewById(R.id.progress_bar);
 		actionBar = findViewById(R.id.action_bar);
 

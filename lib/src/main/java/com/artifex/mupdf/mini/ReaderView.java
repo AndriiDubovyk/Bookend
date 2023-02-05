@@ -7,9 +7,12 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -111,9 +114,13 @@ public class ReaderView extends ViewPager {
         this.direction = SwipeDirection.ALL;
         setBackgroundColor(PageView.BACKGROUND_COLOR);
         setPageTransformer(true, new com.artifex.mupdf.mini.PageTransformer());
+        ReaderView readerView = this;
         addOnPageChangeListener(new OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                actionListener.pageSeparator.setVisibility(VISIBLE);
+                actionListener.pageSeparator.setX(readerView.getWidth()-positionOffsetPixels); // move shadow line
+            }
 
             public void onPageSelected(int position) {
                 actionListener.updatePageNumberInfo(position);

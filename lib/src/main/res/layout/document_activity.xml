@@ -23,6 +23,13 @@
 		app:layout_constraintTop_toTopOf="parent"
 		/>
 
+	<View
+		android:id="@+id/page_separator"
+		android:background="@drawable/shadow_gradient"
+		android:layout_width = "25dp"
+		android:layout_height="match_parent"
+		app:layout_constraintLeft_toLeftOf="parent"/>
+
 	<androidx.fragment.app.FragmentContainerView
 		android:id="@+id/side_menu_container"
 		android:layout_width="0dp"
