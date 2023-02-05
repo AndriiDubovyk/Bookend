@@ -769,7 +769,6 @@ public class DocumentActivity extends FragmentActivity
 				if(i+1<items.size()) nextChapterFirstPage = items.get(i+1).page;
 				items = items.get(i).down;
 				if(items.size()>0 && k == chapterIndices.size()-1) nextChapterFirstPage = items.get(0).page;
-				Log.i("mytag", "c "+nextChapterFirstPage);
 			}
 			if(contentItems.size()>0
 					&& currentPage < contentItems.get(0).page
