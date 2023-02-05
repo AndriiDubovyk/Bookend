@@ -489,7 +489,6 @@ public class DocumentActivity extends FragmentActivity
 
 	private int oldW = 0;
 	private int oldH = 0;
-	private boolean isRelayoutingNow = false;
 	public void onPageViewSizeChanged(int w, int h) {
 		setCanvasSize(w, h);
 		processCutout();
@@ -498,9 +497,8 @@ public class DocumentActivity extends FragmentActivity
 			oldH = h;
 			hasLoaded = true;
 			openDocument();
-		} else if(isReflowable && (oldW != w || oldH != h)  /*&&!isRelayoutingNow*/) {
+		} else if(isReflowable && (oldW != w || oldH != h)  &&!isRelayoutingNow) {
 			setCanvasSize(w, h);
-			isRelayoutingNow = true;
 			oldW = w;
 			oldH = h;
 			readerView.setZoomWithoutUpdate(1);
@@ -574,7 +572,9 @@ public class DocumentActivity extends FragmentActivity
 		});
 	}
 
+	private boolean isRelayoutingNow = false;
 	protected void relayoutDocument() {
+		isRelayoutingNow = true;
 		worker.add(new Worker.Task() {
 			public void work() {
 				try {
@@ -622,7 +622,7 @@ public class DocumentActivity extends FragmentActivity
 			Log.v(APP,"new topMargin value "+value);
 			settingsManager.topMargin = value;
 			setCanvasSize(oldW, oldH);
-			relayoutDocument();
+			if(!isRelayoutingNow) relayoutDocument();
 		}
 	}
 	public void setBotMargin(int value) {
@@ -630,7 +630,7 @@ public class DocumentActivity extends FragmentActivity
 			Log.v(APP,"new botMargin value "+value);
 			settingsManager.botMargin = value;
 			setCanvasSize(oldW, oldH);
-			relayoutDocument();
+			if(!isRelayoutingNow) relayoutDocument();
 		}
 	}
 	public void setLeftMargin(int value) {
@@ -638,7 +638,7 @@ public class DocumentActivity extends FragmentActivity
 			Log.v(APP,"new leftMargin value "+value);
 			settingsManager.leftMargin = value;
 			setCanvasSize(oldW, oldH);
-			relayoutDocument();
+			if(!isRelayoutingNow) relayoutDocument();
 		}
 	}
 	public void setRightMargin(int value) {
@@ -646,7 +646,7 @@ public class DocumentActivity extends FragmentActivity
 			Log.v(APP,"new rightMargin value "+value);
 			settingsManager.rightMargin = value;
 			setCanvasSize(oldW, oldH);
-			relayoutDocument();
+			if(!isRelayoutingNow) relayoutDocument();
 		}
 	}
 
