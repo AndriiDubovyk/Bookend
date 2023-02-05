@@ -48,8 +48,8 @@ public class PageView extends View implements
 	private static final float MIN_SCALE = 1;
 	private static final float MAX_SCALE = 8;
 
-	public static final int BACKGROUND_COLOR = 0xFFf2d3aa;
-	private static final int INK_COLOR = 0xFF6e5837;
+	public static final int BACKGROUND_COLOR = 0xFFf5dcbd;
+	private static final int INK_COLOR = 0xFF58472c;
 
 	private static final int ERROR_PAINT_COLOR = 0xffff5050;
 	private static final int SEARCH_HIT_PAINT_COLOR = 0x30ff0000;
