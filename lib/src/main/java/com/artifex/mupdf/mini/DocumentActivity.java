@@ -508,11 +508,8 @@ public class DocumentActivity extends FragmentActivity
 	}
 
 	private void setCanvasSize(int w, int h) {
-		Log.i("mytag", "s: "+w+" "+h);
-		Log.i("mytag", "testx "+ settingsManager.topMargin);
 		canvasW = settingsManager.getRealCanvasWidth(getResources(), w);
 		canvasH = settingsManager.getRealCanvasHeight(getResources(), h);
-		Log.i("mytag", "f: "+canvasW+" "+canvasH);
 		layoutW = canvasW * 72 / displayDPI;
 		layoutH = canvasH * 72 / displayDPI;
 	}
@@ -762,12 +759,13 @@ public class DocumentActivity extends FragmentActivity
 		if(contentItems!=null) {
 			ArrayList<Integer> chapterIndices = ContentFragment.getContentItemIndicesByPage(contentItems, currentPage);
 			ArrayList<ContentFragment.ContentItem> items = new ArrayList<>(contentItems);
-			for(int i : chapterIndices) {
+			for(int k = 0; k<chapterIndices.size(); k++) {
+				int i = chapterIndices.get(k);
 				chapterName = items.get(i).title;
 				chapterFirstPage = items.get(i).page;
 				if(i+1<items.size()) nextChapterFirstPage = items.get(i+1).page;
 				items = items.get(i).down;
-				if(items.size()>0) nextChapterFirstPage = items.get(0).page;
+				if(items.size()>0 && k == chapterIndices.size()-1) nextChapterFirstPage = items.get(0).page;
 			}
 			if(contentItems.size()>0 && currentPage < contentItems.get(0).page) {
 				nextChapterFirstPage = contentItems.get(0).page;
