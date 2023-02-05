@@ -24,7 +24,7 @@ public class SettingsFragment extends Fragment {
 
     private static final String[] TEXT_ALIGN_OPT = new String[]{"Justify", "Left", "Center", "Right"};
     private static final String[] FONT_FACE_OPT = new String[]{"Charis SIL", "Times New Roman", "Helvetica", "Courier"};
-    private static final int MARGIN_MAX = 30;
+    private static final int MARGIN_MAX = 150;
     private static final int MAX_FONT = 79;
 
     private DocumentActivity actionListener;
@@ -59,7 +59,7 @@ public class SettingsFragment extends Fragment {
         ArrayAdapter<String> font_face_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, FONT_FACE_OPT);
         font_face_adapter.setDropDownViewResource(R.layout.spinner_item);
         font_face_dropdown.setAdapter(font_face_adapter);
-        font_face_dropdown.setSelection(Arrays.asList(FONT_FACE_OPT).indexOf(actionListener.cssManager.fontFace));
+        font_face_dropdown.setSelection(Arrays.asList(FONT_FACE_OPT).indexOf(actionListener.settingsManager.fontFace));
         font_face_dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -75,7 +75,7 @@ public class SettingsFragment extends Fragment {
         TextView fontSizeText = rootView.findViewById(R.id.font_size_text);
         SeekBar fonSizeSeekBar = rootView.findViewById(R.id.font_size_seekbar);
         fonSizeSeekBar.setMax(MAX_FONT);
-        fonSizeSeekBar.setProgress(actionListener.cssManager.fontSize);
+        fonSizeSeekBar.setProgress(actionListener.settingsManager.fontSize);
         fonSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public int newProgress = -1;
             public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
@@ -112,7 +112,7 @@ public class SettingsFragment extends Fragment {
         ArrayAdapter<String> text_align_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, TEXT_ALIGN_OPT);
         text_align_adapter.setDropDownViewResource(R.layout.spinner_item);
         text_align_dropdown.setAdapter(text_align_adapter);
-        text_align_dropdown.setSelection(Arrays.asList(TEXT_ALIGN_OPT).indexOf(actionListener.cssManager.textAlign));
+        text_align_dropdown.setSelection(Arrays.asList(TEXT_ALIGN_OPT).indexOf(actionListener.settingsManager.textAlign));
         text_align_dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -164,16 +164,16 @@ public class SettingsFragment extends Fragment {
         marginSeekBar.setMax(MARGIN_MAX);
         switch (direction) {
             case TOP:
-                marginSeekBar.setProgress(actionListener.cssManager.topMargin);
+                marginSeekBar.setProgress(actionListener.settingsManager.topMargin);
                 break;
             case BOT:
-                marginSeekBar.setProgress(actionListener.cssManager.botMargin);
+                marginSeekBar.setProgress(actionListener.settingsManager.botMargin);
                 break;
             case LEFT:
-                marginSeekBar.setProgress(actionListener.cssManager.leftMargin);
+                marginSeekBar.setProgress(actionListener.settingsManager.leftMargin);
                 break;
             case RIGHT:
-                marginSeekBar.setProgress(actionListener.cssManager.rightMargin);
+                marginSeekBar.setProgress(actionListener.settingsManager.rightMargin);
                 break;
         }
         marginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

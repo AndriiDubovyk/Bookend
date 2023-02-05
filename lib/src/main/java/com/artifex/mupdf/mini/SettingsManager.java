@@ -1,6 +1,9 @@
 package com.artifex.mupdf.mini;
 
-public class CSSManager {
+import android.content.res.Resources;
+import android.util.TypedValue;
+
+public class SettingsManager {
 
     public String fontFace = "Charis SIL";
     public int fontSize = 20; // 1-80
@@ -124,13 +127,12 @@ public class CSSManager {
             "\n" +
             "t{font-style: italic;}";
 
-    public CSSManager() {}
+    public SettingsManager() {}
 
     public String getCSS() {
         return BASE_CSS +
                 "body{font-size: "+getFontSizePercent(fontSize)+"% !important;}"+
                 "body{font-family: "+ fontFace +" !important;}"+
-                "body{margin: "+topMargin+"% "+rightMargin+"% "+botMargin+"% "+leftMargin+"% !important;}"+
                 "p{text-align:"+textAlign.toLowerCase()+" !important;}";
     }
 
@@ -138,5 +140,32 @@ public class CSSManager {
         return 500+25*value;
     }
 
+    private static int dpToPx(int dp, Resources r) {
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                r.getDisplayMetrics()
+        );
+        return px;
+    }
+
+    public int getTopMarginPx(Resources r) {
+        return dpToPx(topMargin, r);
+    }
+    public int getBotMarginPx(Resources r) {
+        return dpToPx(botMargin, r);
+    }
+    public int getLeftMarginPx(Resources r) {
+        return dpToPx(leftMargin, r);
+    }
+    public int getRightMarginPx(Resources r) {
+        return dpToPx(rightMargin, r);
+    }
+    public int getRealCanvasWidth(Resources r, int canvasW) {
+        return canvasW - getLeftMarginPx(r) - getRightMarginPx(r);
+    }
+    public int getRealCanvasHeight(Resources r, int canvasH) {
+        return canvasH - getTopMarginPx(r) - getBotMarginPx(r);
+    }
 
 }

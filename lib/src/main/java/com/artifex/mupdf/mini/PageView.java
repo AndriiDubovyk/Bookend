@@ -371,7 +371,9 @@ public class PageView extends View implements
 			y = -scrollY;
 		}
 
-		// Draw main page contetn
+		// Draw main page content
+		x=x+actionListener.settingsManager.leftMargin-actionListener.settingsManager.rightMargin;
+		y=y+actionListener.settingsManager.topMargin-actionListener.settingsManager.botMargin;
 		dst.set(x, y, x + bitmapW, y + bitmapH);
 		canvas.drawBitmap(bitmap, null, dst, null);
 
