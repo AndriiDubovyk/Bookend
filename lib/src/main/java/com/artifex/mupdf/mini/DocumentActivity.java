@@ -989,7 +989,7 @@ public class DocumentActivity extends FragmentActivity
 
 	protected void showSearch() {
 		currentBar = searchBar;
-		actionBar.setVisibility(View.GONE);
+		actionBar.setVisibility(View.INVISIBLE);
 		searchBar.setVisibility(View.VISIBLE);
 		searchBar.requestFocus();
 		showKeyboard();
@@ -998,7 +998,7 @@ public class DocumentActivity extends FragmentActivity
 	protected void hideSearch() {
 		currentBar = actionBar;
 		actionBar.setVisibility(View.VISIBLE);
-		searchBar.setVisibility(View.GONE);
+		searchBar.setVisibility(View.INVISIBLE);
 		hideKeyboard();
 		searchText.setText("");
 		resetSearch();
