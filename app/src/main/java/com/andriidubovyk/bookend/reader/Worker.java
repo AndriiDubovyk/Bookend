@@ -1,4 +1,4 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 import android.app.Activity;
 import android.util.Log;
@@ -18,16 +18,12 @@ public class Worker implements Runnable
 
 	public Worker(Activity act) {
 		activity = act;
-		queue = new LinkedBlockingQueue<Task>();
+		queue = new LinkedBlockingQueue<>();
 	}
 
 	public void start() {
 		alive = true;
 		new Thread(this).start();
-	}
-
-	public void stop() {
-		alive = false;
 	}
 
 	public void add(Task task) {
@@ -46,11 +42,7 @@ public class Worker implements Runnable
 				activity.runOnUiThread(task);
 			} catch (final Throwable x) {
 				Log.e("MuPDF Worker", x.getMessage());
-				activity.runOnUiThread(new Runnable() {
-					public void run() {
-						Toast.makeText(activity, x.getMessage(), Toast.LENGTH_SHORT).show();
-					}
-				});
+				activity.runOnUiThread(() -> Toast.makeText(activity, x.getMessage(), Toast.LENGTH_SHORT).show());
 			}
 		}
 	}

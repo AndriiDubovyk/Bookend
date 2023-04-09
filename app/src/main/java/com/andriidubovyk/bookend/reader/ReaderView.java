@@ -1,23 +1,16 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
-import java.lang.reflect.Field;
 
 public class ReaderView extends ViewPager {
     private PagerAdapter pagerAdapter;
@@ -31,17 +24,17 @@ public class ReaderView extends ViewPager {
 
 
     enum SwipeDirection {
-        ALL, LEFT, RIGHT, NONE ;
+        ALL, LEFT, RIGHT, NONE
     }
 
     public ReaderView(@NonNull Context context) {
         super(context);
-        setup(context);
+        setup();
     }
 
     public ReaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setup(context);
+        setup();
     }
 
     @Override
@@ -100,25 +93,21 @@ public class ReaderView extends ViewPager {
         ((PageAdapter)getAdapter()).updateCachedPages();
     }
 
-    public void updateCachedPagesScroll(int scrollX, int scrollY) {
-        ((PageAdapter)pagerAdapter).updateCachedPagesScroll(scrollX, scrollY);
-    }
-
     public void setActionListener(DocumentActivity da) {
         actionListener = da;
     }
 
 
     private int prevPage = -1;
-    private void setup(Context context) {
+    private void setup() {
         this.direction = SwipeDirection.ALL;
         setBackgroundColor(PageView.BACKGROUND_COLOR);
-        setPageTransformer(true, new com.artifex.mupdf.mini.PageTransformer());
+        setPageTransformer(true, new com.andriidubovyk.bookend.reader.PageTransformer());
         ReaderView readerView = this;
         addOnPageChangeListener(new OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {}
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                actionListener.pageSeparator.setVisibility(VISIBLE);
+                actionListener.pageSeparator.setVisibility(View.VISIBLE);
                 actionListener.pageSeparator.setX(readerView.getWidth()-positionOffsetPixels); // move shadow line
             }
 
@@ -138,6 +127,7 @@ public class ReaderView extends ViewPager {
         this.currentPageScrollY = scrollY;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (this.isSwipeAllowed(event)) {
@@ -169,13 +159,11 @@ public class ReaderView extends ViewPager {
 
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
             float diffX = event.getX() - initialXValue;
+            // swipe from right to left detected
             if (diffX > 0 && direction == SwipeDirection.RIGHT) {
                 // swipe from left to right detected
                 return false;
-            } else if (diffX < 0 && direction == SwipeDirection.LEFT) {
-                // swipe from right to left detected
-                return false;
-            }
+            } else return !(diffX < 0) || direction != SwipeDirection.LEFT;
         }
 
         return true;

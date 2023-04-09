@@ -1,4 +1,4 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 import android.content.res.Resources;
 import android.util.TypedValue;
@@ -141,12 +141,11 @@ public class SettingsManager {
     }
 
     private static int dpToPx(int dp, Resources r) {
-        int px = (int) TypedValue.applyDimension(
+        return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 dp,
                 r.getDisplayMetrics()
         );
-        return px;
     }
 
     public int getTopMarginPx(Resources r) {

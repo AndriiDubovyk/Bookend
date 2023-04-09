@@ -5,7 +5,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
 
-	<com.artifex.mupdf.mini.ReaderView
+	<com.andriidubovyk.bookend.reader.ReaderView
 		android:id="@+id/reader_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"

@@ -87,7 +87,7 @@ Then install the app on the device:
 
 To start the installed app on the device:
 
-	$ adb shell am start -n com.artifex.mupdf.mini.app/.LibraryActivity
+	$ adb shell am start -n com.andriidubovyk.bookend/.LibraryActivity
 
 To see the error and debugging message log:
 

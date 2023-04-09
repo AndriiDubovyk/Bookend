@@ -1,10 +1,10 @@
-package com.artifex.mupdf.mini.app;
+package com.andriidubovyk.bookend;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.artifex.mupdf.mini.DocumentActivity;
+import com.andriidubovyk.bookend.reader.DocumentActivity;
 
 public class LibraryActivity extends Activity
 {
@@ -32,7 +32,6 @@ public class LibraryActivity extends Activity
 			"application/octet-stream"
 		});
 		startActivityForResult(intent, FILE_REQUEST);
-//		startActivity(new Intent(LibraryActivity.this, ScreenSlidePagerActivity.class));
 	}
 
 	public void onActivityResult(int request, int result, Intent data) {

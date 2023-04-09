@@ -1,5 +1,6 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -9,7 +10,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -17,9 +17,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.ListFragment;
+
+import com.andriidubovyk.bookend.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,20 +48,19 @@ public class ContentFragment extends ListFragment {
             this.down = down;
         }
 
-        public ContentItem clone() {
-            return new ContentItem(title, uri, page, level, down);
-        }
 
+        @NonNull
         public String toString() {
-            String res = "";
+            StringBuilder res = new StringBuilder();
             if(down!=null) {
                 for(ContentItem ci : down) {
-                    res += ci.toString() + ", ";
+                    res.append(ci.toString()).append(", ");
                 }
             }
             return title + "{ "+res +" }";
         }
     }
+    @SuppressLint("InflateParams")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -133,13 +133,9 @@ public class ContentFragment extends ListFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
-        try {
-            if(actionListener==null) actionListener = (DocumentActivity) activity;
-        } catch (Exception e) {
-            throw e;
-        }
+        if(actionListener==null) actionListener = (DocumentActivity) activity;
     }
 
     @Override
@@ -197,7 +193,7 @@ public class ContentFragment extends ListFragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View itemView = inflater.inflate(R.layout.content_item, parent, false);
+            @SuppressLint("ViewHolder") View itemView = inflater.inflate(R.layout.content_item, parent, false);
 
             ContentItem item = getItem(position);
             TextView titleTextView = itemView.findViewById(R.id.contentTitle);
@@ -206,7 +202,7 @@ public class ContentFragment extends ListFragment {
             LinearLayout wrapper = itemView.findViewById(R.id.wrapper);
             if(position==selectedItem)
                 wrapper.setBackground(ContextCompat.getDrawable(context, R.drawable.content_selected_item_background));
-            int leftMargin = 16 * (item.level < 4 ? item.level : 4);
+            int leftMargin = 16 * (Math.min(item.level, 4));
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -229,7 +225,7 @@ public class ContentFragment extends ListFragment {
 
     }
 
-    private View.OnClickListener expandBtnClickListener = new View.OnClickListener() {
+    private final View.OnClickListener expandBtnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             final int position = getListView().getPositionForView(v);
@@ -244,11 +240,10 @@ public class ContentFragment extends ListFragment {
 
     private int dpToPx(int dp) {
         Resources r = getResources();
-        int px = (int) TypedValue.applyDimension(
+        return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 dp,
                 r.getDisplayMetrics()
         );
-        return px;
     }
 }

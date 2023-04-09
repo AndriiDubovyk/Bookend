@@ -1,22 +1,25 @@
 apply plugin: 'com.android.application'
 
-group = 'com.artifex.mupdf'
-version = '1.20.2a'
-
 dependencies {
-	if (file('../lib/build.gradle').isFile())
-		api project(':lib')
+	implementation 'androidx.appcompat:appcompat:1.6.1'
+	implementation 'com.google.android.material:material:1.8.0'
+	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+	implementation "androidx.fragment:fragment:1.5.6"
+
+	if (file('../jni/build.gradle').isFile())
+		api project(':jni')
 	else
-		api 'com.artifex.mupdf:mini:1.20.2a'
+		api 'com.artifex.mupdf:fitz:1.20.2'
 }
 
 android {
-	compileSdkVersion 31
+	compileSdkVersion 33
 	defaultConfig {
+		applicationId "com.andriidubovyk.bookend"
 		minSdkVersion 21
-		targetSdkVersion 31
-		versionName '1.20.2a'
-		versionCode 102
+		targetSdkVersion 33
+		versionName '1.0'
+		versionCode 1
 	}
 
 	splits {

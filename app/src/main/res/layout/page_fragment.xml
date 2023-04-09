@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     >
 
-    <com.artifex.mupdf.mini.PageView android:id="@+id/page_view_fragment"
+    <com.andriidubovyk.bookend.reader.PageView
+        android:id="@+id/page_view_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"

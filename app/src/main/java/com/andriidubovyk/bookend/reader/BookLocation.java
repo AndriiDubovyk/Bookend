@@ -1,6 +1,6 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
-import android.util.Log;
+import androidx.annotation.NonNull;
 
 import com.artifex.mupdf.fitz.Document;
 import com.artifex.mupdf.fitz.Location;
@@ -37,6 +37,7 @@ public class BookLocation {
         return ((float) current) / (count - 1);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "BookLocation{" +

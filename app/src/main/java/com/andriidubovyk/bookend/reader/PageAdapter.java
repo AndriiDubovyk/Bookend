@@ -1,26 +1,19 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.SparseArray;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import com.artifex.mupdf.fitz.Document;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class PageAdapter extends FragmentStatePagerAdapter {
     private final DocumentActivity actionListener;
     private PageFragment mCurrentPageFragment;
-    private HashMap<Integer, Fragment> cache = new HashMap<Integer, Fragment>(3);
+    private final HashMap<Integer, Fragment> cache = new HashMap<>(3);
 
     public PageAdapter(FragmentManager fm, DocumentActivity da) {
         super(fm);
@@ -63,6 +56,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         }
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         Bundle arguments = new Bundle();

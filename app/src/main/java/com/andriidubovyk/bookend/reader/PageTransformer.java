@@ -1,10 +1,6 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.View;
-
 import androidx.viewpager.widget.ViewPager;
 
 /**

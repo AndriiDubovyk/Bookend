@@ -1,12 +1,17 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
-import com.artifex.mupdf.fitz.*;
+import com.artifex.mupdf.fitz.Document;
+import com.artifex.mupdf.fitz.Outline;
+import com.artifex.mupdf.fitz.Page;
+import com.artifex.mupdf.fitz.Quad;
+import com.artifex.mupdf.fitz.SeekableInputStream;
+import com.andriidubovyk.bookend.R;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -26,7 +31,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -39,6 +43,7 @@ import androidx.fragment.app.FragmentManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Stack;
 
 public class DocumentActivity extends FragmentActivity
@@ -104,7 +109,6 @@ public class DocumentActivity extends FragmentActivity
 	protected View searchBackwardButton;
 	protected View searchForwardButton;
 	protected View settingsButton;
-	protected PopupMenu layoutPopupMenu;
 	protected View outlineButton;
 	protected View navigationBar;
 	protected TextView pageLabel;
@@ -127,7 +131,7 @@ public class DocumentActivity extends FragmentActivity
 	protected SettingsFragment settingsFragment = new SettingsFragment();
 
 
-	private void openInput(Uri uri, long size, String mimetype) throws IOException {
+	private void openInput(Uri uri, long size) throws IOException {
 		ContentResolver cr = getContentResolver();
 
 		Log.i(APP, "Opening document " + uri);
@@ -190,7 +194,7 @@ public class DocumentActivity extends FragmentActivity
 
 		key = uri.toString();
 
-		Log.i(APP, "OPEN URI " + uri.toString());
+		Log.i(APP, "OPEN URI " + uri);
 		Log.i(APP, "  MAGIC (Intent) " + mimetype);
 
 		settingsManager = new SettingsManager();
@@ -214,11 +218,9 @@ public class DocumentActivity extends FragmentActivity
 
 		title = "";
 		long size = -1;
-		Cursor cursor = null;
 
-		try {
-			cursor = getContentResolver().query(uri, null, null, null, null, null);
-			if (cursor != null && cursor.moveToFirst()){
+		try (Cursor cursor = getContentResolver().query(uri, null, null, null, null, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
 				int idx;
 
 				idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -235,9 +237,6 @@ public class DocumentActivity extends FragmentActivity
 		} catch (Exception x) {
 			// Ignore any exception and depend on default values for title
 			// and size (unless one was decoded
-		} finally {
-			if (cursor != null)
-				cursor.close();
 		}
 
 		Log.i(APP, "  NAME " + title);
@@ -253,7 +252,7 @@ public class DocumentActivity extends FragmentActivity
 		}
 
 		try {
-			openInput(uri, size, mimetype);
+			openInput(uri, size);
 		} catch (Exception x) {
 			Log.e(APP, x.toString());
 			Toast.makeText(this, x.getMessage(), Toast.LENGTH_SHORT).show();
@@ -262,11 +261,10 @@ public class DocumentActivity extends FragmentActivity
 		titleLabel = (TextView)findViewById(R.id.title_label);
 		titleLabel.setText(title);
 
-		history = new Stack<BookLocation>();
+		history = new Stack<>();
 
 		worker = new Worker(this);
 		worker.start();
-
 
 		searchHitPage = -1;
 		hasLoaded = false;
@@ -275,6 +273,7 @@ public class DocumentActivity extends FragmentActivity
 		pageSeekbar = findViewById(R.id.page_seekbar);
 		pageSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			public int newProgress = -1;
+			@SuppressLint("SetTextI18n")
 			public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
 				if (fromUser) {
 					newProgress = progress;
@@ -291,24 +290,18 @@ public class DocumentActivity extends FragmentActivity
 		chapterPageLabel = findViewById(R.id.chapter_page);
 
 		searchButton = findViewById(R.id.search_button);
-		searchButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				showSearch();
-			}
-		});
+		searchButton.setOnClickListener(v -> showSearch());
 		searchText = (EditText)findViewById(R.id.search_text);
-		searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
-					search(1);
-					return true;
-				}
-				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-					search(1);
-					return true;
-				}
-				return false;
+		searchText.setOnEditorActionListener((v, actionId, event) -> {
+			if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_DOWN) {
+				search(1);
+				return true;
 			}
+			if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+				search(1);
+				return true;
+			}
+			return false;
 		});
 		searchText.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {}
@@ -318,43 +311,27 @@ public class DocumentActivity extends FragmentActivity
 			}
 		});
 		searchCloseButton = findViewById(R.id.search_close_button);
-		searchCloseButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				hideSearch();
-			}
-		});
+		searchCloseButton.setOnClickListener(v -> hideSearch());
 		searchBackwardButton = findViewById(R.id.search_backward_button);
-		searchBackwardButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(-1);
-			}
-		});
+		searchBackwardButton.setOnClickListener(v -> search(-1));
 		searchForwardButton = findViewById(R.id.search_forward_button);
-		searchForwardButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				search(1);
-			}
-		});
+		searchForwardButton.setOnClickListener(v -> search(1));
 
 		outlineButton = findViewById(R.id.outline_button);
-		outlineButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				if(currentFragmentState == FragmentsState.CONTENT) {
-					manageFragmentTransaction(FragmentsState.NONE);
-				} else {
-					manageFragmentTransaction(FragmentsState.CONTENT);
-				}
+		outlineButton.setOnClickListener(v -> {
+			if(currentFragmentState == FragmentsState.CONTENT) {
+				manageFragmentTransaction(FragmentsState.NONE);
+			} else {
+				manageFragmentTransaction(FragmentsState.CONTENT);
 			}
 		});
 
 		settingsButton = findViewById(R.id.settings_button);
-		settingsButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				if(currentFragmentState == FragmentsState.SETTINGS) {
-					manageFragmentTransaction(FragmentsState.NONE);
-				} else {
-					manageFragmentTransaction(FragmentsState.SETTINGS);
-				}
+		settingsButton.setOnClickListener(v -> {
+			if(currentFragmentState == FragmentsState.SETTINGS) {
+				manageFragmentTransaction(FragmentsState.NONE);
+			} else {
+				manageFragmentTransaction(FragmentsState.SETTINGS);
 			}
 		});
 		readerView = findViewById(R.id.reader_view);
@@ -519,20 +496,15 @@ public class DocumentActivity extends FragmentActivity
 
 	private void callFullscreen() {
 		Log.v(APP, "call fullscreen");
-		if(Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
-			View v = this.getWindow().getDecorView();
-			v.setSystemUiVisibility(View.GONE);
-		} else if(Build.VERSION.SDK_INT >= 19) {
-			//for new api versions.
-			View decorView = getWindow().getDecorView();
-			int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-					| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-					| View.SYSTEM_UI_FLAG_FULLSCREEN
-					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-			decorView.setSystemUiVisibility(uiOptions);
-		}
+		//for new api versions.
+		View decorView = getWindow().getDecorView();
+		int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+				| View.SYSTEM_UI_FLAG_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+		decorView.setSystemUiVisibility(uiOptions);
 	}
 
 	@Override
@@ -658,13 +630,12 @@ public class DocumentActivity extends FragmentActivity
 		com.artifex.mupdf.fitz.Context.setUserCSS(settingsManager.getCSS());
 		savedBookLoc = new BookLocation(doc, currentPage);
 		worker.add(new Worker.Task() {
-			boolean needsPassword;
 			public void work() {
 				Log.i(APP, "open document");
 				if (buffer != null)
 					doc = Document.openDocument(buffer, mimetype);
 				else
-					doc = Document.openDocument(stream, mimetype);;
+					doc = Document.openDocument(stream, mimetype);
 			}
 			public void run() {
 				reloadDocument();
@@ -681,21 +652,9 @@ public class DocumentActivity extends FragmentActivity
 		builder.setTitle(R.string.dlog_password_title);
 		builder.setMessage(message);
 		builder.setView(passwordView);
-		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				checkPassword(passwordView.getText().toString());
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				finish();
-			}
-		});
-		builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-				finish();
-			}
-		});
+		builder.setPositiveButton(android.R.string.ok, (dialog, id) -> checkPassword(passwordView.getText().toString()));
+		builder.setNegativeButton(android.R.string.cancel, (dialog, id) -> finish());
+		builder.setOnCancelListener(dialog -> finish());
 		builder.create().show();
 	}
 
@@ -785,8 +744,8 @@ public class DocumentActivity extends FragmentActivity
 
 	public void onActivityResult(int request, int result, Intent data) {
 		super.onActivityResult(request, result, data);
-		if (request == NAVIGATE_REQUEST && result >= RESULT_FIRST_USER)
-			gotoPage(result - RESULT_FIRST_USER);
+		if (request == NAVIGATE_REQUEST && result >= Activity.RESULT_FIRST_USER)
+			gotoPage(result - Activity.RESULT_FIRST_USER);
 	}
 
 	protected void showKeyboard() {
@@ -815,7 +774,7 @@ public class DocumentActivity extends FragmentActivity
 		worker.add(new Worker.Task() {
 			int searchPage = startPage;
 			public void work() {
-				if (stopSearch || needle != searchNeedle)
+				if (stopSearch || !Objects.equals(needle, searchNeedle))
 					return;
 				for (int i = 0; i < 9; ++i) {
 					Log.i(APP, "search page " + searchPage);
@@ -832,7 +791,7 @@ public class DocumentActivity extends FragmentActivity
 				}
 			}
 			public void run() {
-				if (stopSearch || needle != searchNeedle) {
+				if (stopSearch || !Objects.equals(needle, searchNeedle)) {
 					pageLabel.setText((currentPage+1) + " / " + pageCount);
 				} else if (searchHitPage == currentPage) {
 					readerView.updateCachedPages();
@@ -947,7 +906,6 @@ public class DocumentActivity extends FragmentActivity
 	public String getSearchNeedle() { return searchNeedle; }
 	public void setStopSearch(boolean v) { stopSearch=v; }
 	public int getCanvasW() { return canvasW; }
-	public int getCanvasH() { return canvasH; }
 	public Worker getWorker() {return worker; }
 
 	private void loadOutline() {
@@ -1017,7 +975,7 @@ public class DocumentActivity extends FragmentActivity
 			navigationBar.setVisibility(View.VISIBLE);
 			if (currentBar == searchBar) {
 				searchBar.requestFocus();
-				if(searchText.getText().equals("")) showKeyboard();
+				if(searchText.getText().toString().equals("")) showKeyboard();
 			}
 		}
 	}

@@ -1,5 +1,6 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.andriidubovyk.bookend.R;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
@@ -32,7 +35,7 @@ public class SettingsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.settings_fragment, null);
+        @SuppressLint("InflateParams") View rootView = inflater.inflate(R.layout.settings_fragment, null);
         initAlignSettings(rootView);
         initFontSettings(rootView);
         initMarginSettings(rootView);
@@ -46,17 +49,13 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            if(actionListener==null) actionListener = (DocumentActivity) activity;
-        } catch (Exception e) {
-            throw e;
-        }
+        if(actionListener==null) actionListener = (DocumentActivity) activity;
     }
 
     public void initFontSettings(View rootView) {
         Spinner font_face_dropdown = rootView.findViewById(R.id.font_face_spinner);
         avoidSpinnerDropdownFocus(font_face_dropdown);
-        ArrayAdapter<String> font_face_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, FONT_FACE_OPT);
+        ArrayAdapter<String> font_face_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_selected_item, FONT_FACE_OPT);
         font_face_adapter.setDropDownViewResource(R.layout.spinner_item);
         font_face_dropdown.setAdapter(font_face_adapter);
         font_face_dropdown.setSelection(Arrays.asList(FONT_FACE_OPT).indexOf(actionListener.settingsManager.fontFace));
@@ -87,29 +86,23 @@ public class SettingsFragment extends Fragment {
         });
         fontSizeText.setText(""+(fonSizeSeekBar.getProgress()+1));
         ImageButton minusFontSizeBtn = rootView.findViewById(R.id.minus_font_size_btn);
-        minusFontSizeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(fonSizeSeekBar.getProgress()>0)
-                    fonSizeSeekBar.setProgress(fonSizeSeekBar.getProgress()-1);
-                actionListener.setFontSize(fonSizeSeekBar.getProgress());
-            }
+        minusFontSizeBtn.setOnClickListener(view -> {
+            if(fonSizeSeekBar.getProgress()>0)
+                fonSizeSeekBar.setProgress(fonSizeSeekBar.getProgress()-1);
+            actionListener.setFontSize(fonSizeSeekBar.getProgress());
         });
         ImageButton plusFontSizeBtn = rootView.findViewById(R.id.plus_font_size_btn);
-        plusFontSizeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(fonSizeSeekBar.getProgress()<MAX_FONT)
-                    fonSizeSeekBar.setProgress(fonSizeSeekBar.getProgress()+1);
-                actionListener.setFontSize(fonSizeSeekBar.getProgress());
-            }
+        plusFontSizeBtn.setOnClickListener(view -> {
+            if(fonSizeSeekBar.getProgress()<MAX_FONT)
+                fonSizeSeekBar.setProgress(fonSizeSeekBar.getProgress()+1);
+            actionListener.setFontSize(fonSizeSeekBar.getProgress());
         });
     }
 
     public void initAlignSettings(View rootView) {
         Spinner text_align_dropdown = rootView.findViewById(R.id.text_align_spinner);
         avoidSpinnerDropdownFocus(text_align_dropdown);
-        ArrayAdapter<String> text_align_adapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_selected_item, TEXT_ALIGN_OPT);
+        ArrayAdapter<String> text_align_adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_selected_item, TEXT_ALIGN_OPT);
         text_align_adapter.setDropDownViewResource(R.layout.spinner_item);
         text_align_dropdown.setAdapter(text_align_adapter);
         text_align_dropdown.setSelection(Arrays.asList(TEXT_ALIGN_OPT).indexOf(actionListener.settingsManager.textAlign));
@@ -189,22 +182,16 @@ public class SettingsFragment extends Fragment {
         });
         marginText.setText(""+marginSeekBar.getProgress());
         ImageButton minusMarginBtn = rootView.findViewById(minusBtnId);
-        minusMarginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(marginSeekBar.getProgress()>0)
-                    marginSeekBar.setProgress(marginSeekBar.getProgress()-1);
-                setMargin(marginSeekBar.getProgress(), direction);
-            }
+        minusMarginBtn.setOnClickListener(view -> {
+            if(marginSeekBar.getProgress()>0)
+                marginSeekBar.setProgress(marginSeekBar.getProgress()-1);
+            setMargin(marginSeekBar.getProgress(), direction);
         });
         ImageButton plusMarginBtn = rootView.findViewById(plusBtnId);
-        plusMarginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(marginSeekBar.getProgress()<MARGIN_MAX)
-                    marginSeekBar.setProgress(marginSeekBar.getProgress()+1);
-                setMargin(marginSeekBar.getProgress(), direction);
-            }
+        plusMarginBtn.setOnClickListener(view -> {
+            if(marginSeekBar.getProgress()<MARGIN_MAX)
+                marginSeekBar.setProgress(marginSeekBar.getProgress()+1);
+            setMargin(marginSeekBar.getProgress(), direction);
         });
     }
 
@@ -227,20 +214,18 @@ public class SettingsFragment extends Fragment {
 
     public static void avoidSpinnerDropdownFocus(Spinner spinner) {
         try {
-            Field listPopupField = Spinner.class.getDeclaredField("mPopup");
+            @SuppressLint("DiscouragedPrivateApi") Field listPopupField = Spinner.class.getDeclaredField("mPopup");
             listPopupField.setAccessible(true);
             Object listPopup = listPopupField.get(spinner);
             if (listPopup instanceof ListPopupWindow) {
-                Field popupField = ListPopupWindow.class.getDeclaredField("mPopup");
+                @SuppressLint("DiscouragedPrivateApi") Field popupField = ListPopupWindow.class.getDeclaredField("mPopup");
                 popupField.setAccessible(true);
                 Object popup = popupField.get((ListPopupWindow) listPopup);
                 if (popup instanceof PopupWindow) {
                     ((PopupWindow) popup).setFocusable(false);
                 }
             }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

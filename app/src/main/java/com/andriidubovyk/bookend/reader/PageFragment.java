@@ -1,16 +1,16 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
+import com.andriidubovyk.bookend.R;
+
 public class PageFragment extends Fragment {
 
     public static final String PAGE_NUMBER = "page_number";
-    private ViewGroup root;
     private PageView pageView;
     private int pageNumber;
     private DocumentActivity actionListener;
@@ -29,8 +29,7 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.page_fragment, container, false);
-        root = rootView;
-        pageView = root.findViewById(R.id.page_view_fragment);
+        pageView = rootView.findViewById(R.id.page_view_fragment);
         Bundle arguments = getArguments();
         if (arguments != null) {
             int pageNumber = arguments.getInt(PAGE_NUMBER);

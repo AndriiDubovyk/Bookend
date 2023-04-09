@@ -1,8 +1,9 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 import com.artifex.mupdf.fitz.*;
 import com.artifex.mupdf.fitz.android.AndroidDrawDevice;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -100,7 +101,7 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	private void setBitmap(Bitmap b, Link[] ls, Quad[][] hs, boolean invalidate) {
+	private void setBitmap(Bitmap b, Link[] ls, Quad[][] hs) {
 		if (bitmap != null)
 			bitmap.recycle();
 		error = false;
@@ -110,11 +111,6 @@ public class PageView extends View implements
 		bitmapW = (int)(bitmap.getWidth() * viewScale);
 		bitmapH = (int)(bitmap.getHeight() * viewScale);
 		scroller.forceFinished(true);
-		if(invalidate) invalidate();
-	}
-
-	private void setBitmap(Bitmap b, Link[] ls, Quad[][] hs) {
-		setBitmap(b, ls, hs, true);
 	}
 
 	private boolean isActivePage() {
@@ -156,7 +152,7 @@ public class PageView extends View implements
 			}
 			public void run() {
 				if (bitmap != null) {
-					setBitmap(bitmap, links, hits, false);
+					setBitmap(bitmap, links, hits);
 					setPageZoom(actionListener.getCommonZoom(), false);
 					setPageScroll(actionListener.readerView.currentPageScrollX, actionListener.readerView.currentPageScrollY, false);
 					invalidate();
@@ -181,6 +177,7 @@ public class PageView extends View implements
 		canvasH = h;
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {
 		detector.onTouchEvent(event);
 		scaleDetector.onTouchEvent(event);
@@ -200,10 +197,6 @@ public class PageView extends View implements
 		invalidate();
 	}
 
-	private void switchLinks() {
-		showLinks = !showLinks;
-	}
-
 	@RequiresApi(api = Build.VERSION_CODES.N)
 	public boolean onSingleTapUp(MotionEvent e) {
 		actionListener.manageFragmentTransaction(DocumentActivity.FragmentsState.NONE);
@@ -211,8 +204,8 @@ public class PageView extends View implements
 		float x = e.getX();
 		float y = e.getY();
 		if (showLinks && links != null) {
-			float dx = (bitmapW <= canvasW) ? (bitmapW - canvasW) / 2 : scrollX;
-			float dy = (bitmapH <= canvasH) ? (bitmapH - canvasH) / 2 : scrollY;
+			float dx = (bitmapW <= canvasW) ? (bitmapW - canvasW) / 2f : scrollX;
+			float dy = (bitmapH <= canvasH) ? (bitmapH - canvasH) / 2f : scrollY;
 			float mx = (x + dx) / viewScale;
 			float my = (y + dy) / viewScale;
 			for (Link link : links) {
@@ -333,15 +326,15 @@ public class PageView extends View implements
 	}
 
 
-	private android.graphics.Rect dst = new android.graphics.Rect();
-	private Path path = new Path();
+	private final android.graphics.Rect dst = new android.graphics.Rect();
+	private final Path path = new Path();
 
 	public void onDraw(Canvas canvas) {
 		int x, y;
 
 		if (bitmap == null) {
 			if (error) {
-				canvas.translate(canvasW / 2, canvasH / 2);
+				canvas.translate(canvasW / 2f, canvasH / 2f);
 				canvas.drawPath(errorPath, errorPaint);
 			}
 			return;

@@ -18,9 +18,9 @@ sync: archive
 	rsync -av --chmod=g+w --chown=:gs-priv $(HOME)/MAVEN/com/ ghostscript.com:/var/www/maven.ghostscript.com/com/
 
 run: install
-	adb shell am start -n com.artifex.mupdf.mini.app/.LibraryActivity
+	adb shell am start -n com.andriidubovyk.bookend/.LibraryActivity
 run-release: install-release
-	adb shell am start -n com.artifex.mupdf.mini.app/.LibraryActivity
+	adb shell am start -n com.andriidubovyk.bookend/.LibraryActivity
 
 tarball: release
 	cp app/build/outputs/apk/release/app-universal-release.apk \

@@ -1,3 +1,2 @@
 include ':jni'
-include ':lib'
 include ':app'

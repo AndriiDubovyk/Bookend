@@ -1,4 +1,4 @@
-package com.artifex.mupdf.mini;
+package com.andriidubovyk.bookend.reader;
 
 import com.artifex.mupdf.fitz.SeekableInputStream;
 
@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ContentInputStream implements SeekableInputStream {
-	private final String APP = "MuPDF";
 
 	protected ContentResolver cr;
 	protected Uri uri;
@@ -51,7 +50,7 @@ public class ContentInputStream implements SeekableInputStream {
 				try {
 					is.skip(newp - p);
 				} catch (IOException x) {
-					Log.i(APP, "Unable to skip backwards, reopening input stream");
+					Log.i("MuPDF", "Unable to skip backwards, reopening input stream");
 					mustReopenStream = true;
 				}
 			}

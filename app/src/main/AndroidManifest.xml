@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.artifex.mupdf.mini.app"
+	package="com.andriidubovyk.bookend"
 	android:installLocation="auto"
 	>
+
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
 	<application
-		android:label="MuPDF mini"
+		android:label="Bookend"
 		android:icon="@drawable/ic_mupdf"
 		>
 		<activity
@@ -14,6 +17,29 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity
+			android:name=".reader.DocumentActivity"
+			android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data android:mimeType="application/pdf" />
+				<data android:mimeType="application/vnd.ms-xpsdocument" />
+				<data android:mimeType="application/oxps" />
+				<data android:mimeType="application/vnd.comicbook+zip" />
+				<data android:mimeType="application/x-cbz" />
+				<data android:mimeType="application/epub+zip" />
+				<data android:mimeType="application/x-fictionbook" />
+
+				<!-- Specify the schemes that your app can handle -->
+				<data android:scheme="http" />
+				<data android:scheme="https" />
+				<data android:mimeType="application/octet-stream" />
 			</intent-filter>
 		</activity>
 	</application>
