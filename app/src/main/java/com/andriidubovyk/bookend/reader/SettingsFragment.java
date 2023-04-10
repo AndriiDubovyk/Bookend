@@ -2,6 +2,8 @@ package com.andriidubovyk.bookend.reader;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         @SuppressLint("InflateParams") View rootView = inflater.inflate(R.layout.settings_fragment, null);
+        initLinks(rootView);
         initAlignSettings(rootView);
         initFontSettings(rootView);
         initMarginSettings(rootView);
@@ -50,6 +53,20 @@ public class SettingsFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if(actionListener==null) actionListener = (DocumentActivity) activity;
+    }
+
+    public void initLinks(View rooView) {
+        TextView githubLinkTextView = rooView.findViewById(R.id.github_link_text_view);
+        githubLinkTextView.setOnClickListener(v -> openTextViewLinkInBrowser(githubLinkTextView));
+        TextView mupdfLinkTextView = rooView.findViewById(R.id.mupdf_link_text_view);
+        mupdfLinkTextView.setOnClickListener(v -> openTextViewLinkInBrowser(mupdfLinkTextView));
+    }
+
+    public void openTextViewLinkInBrowser(TextView textView) {
+        String url = textView.getText().toString();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 
     public void initFontSettings(View rootView) {

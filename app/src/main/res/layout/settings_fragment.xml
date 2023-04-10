@@ -2,7 +2,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/transparent">
 
     <LinearLayout
@@ -25,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="FONT FACE"
+                android:text="@string/font_face"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -57,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="FONT SIZE"
+                android:text="@string/font_size"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -84,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:contentDescription="minus" />
+                    android:contentDescription="@string/minus" />
                 <SeekBar android:id="@+id/font_size_seekbar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -101,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_right_white_24dp"
-                    android:contentDescription="plus" />
+                    android:contentDescription="@string/plus" />
 
             </LinearLayout>
 
@@ -121,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="TEXT ALIGN"
+                android:text="@string/text_align"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -151,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="TOP MARGIN"
+                android:text="@string/top_margin"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -177,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:contentDescription="minus" />
+                    android:contentDescription="@string/minus" />
                 <SeekBar android:id="@+id/top_margin_seekbar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -194,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_right_white_24dp"
-                    android:contentDescription="plus" />
+                    android:contentDescription="@string/plus" />
             </LinearLayout>
         </LinearLayout>
 
@@ -212,7 +211,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="BOTTOM MARGIN"
+                android:text="@string/bottom_margin"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -238,7 +237,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:contentDescription="minus" />
+                    android:contentDescription="@string/minus" />
                 <SeekBar android:id="@+id/bot_margin_seekbar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -255,7 +254,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_right_white_24dp"
-                    android:contentDescription="plus" />
+                    android:contentDescription="@string/plus" />
             </LinearLayout>
         </LinearLayout>
 
@@ -273,7 +272,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="LEFT MARGIN"
+                android:text="@string/left_margin"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -299,7 +298,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:contentDescription="minus" />
+                    android:contentDescription="@string/minus" />
                 <SeekBar android:id="@+id/left_margin_seekbar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -316,7 +315,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_right_white_24dp"
-                    android:contentDescription="plus" />
+                    android:contentDescription="@string/plus" />
             </LinearLayout>
         </LinearLayout>
 
@@ -334,7 +333,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="RIGHT MARGIN"
+                android:text="@string/right_margin"
                 android:textColor="@color/supply_color1"
                 android:textStyle="bold"
                 android:textSize="12sp"
@@ -360,7 +359,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_left_white_24dp"
-                    android:contentDescription="minus" />
+                    android:contentDescription="@string/minus" />
                 <SeekBar android:id="@+id/right_margin_seekbar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -377,8 +376,68 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/button"
                     android:src="@drawable/ic_chevron_right_white_24dp"
-                    android:contentDescription="plus" />
+                    android:contentDescription="@string/plus" />
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="2dp"
+            android:id="@+id/links_item"
+            android:background="@drawable/settings_item_background"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/links"
+                android:textColor="@color/supply_color1"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/source_code"
+                android:textColor="@color/supply_color1"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:id="@+id/github_link_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/github_link"
+                android:textColor="@color/text_color2"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/mupdf"
+                android:textColor="@color/supply_color1"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
+            <TextView
+                android:id="@+id/mupdf_link_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/mupdf_link"
+                android:textColor="@color/text_color2"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                />
         </LinearLayout>
 
 
